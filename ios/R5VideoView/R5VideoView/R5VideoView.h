@@ -21,6 +21,7 @@
 @property R5Connection *connection;
 @property R5Configuration *configuration;
 @property R5VideoViewController *controller;
+@property R5SharedObject *sharedObject;
 
 - (void)loadConfiguration:(R5Configuration *)configuration forKey:(NSString *)key;
 - (void)onDeviceOrientation:(NSNotification *)notification;
@@ -32,6 +33,7 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onSubscriberStreamStatus;
 @property (nonatomic, copy) RCTBubblingEventBlock onUnpublishNotification;
 @property (nonatomic, copy) RCTBubblingEventBlock onUnsubscribeNotification;
+@property (nonatomic, copy) RCTBubblingEventBlock onReceiveSharedObjectEvent;
 
 # pragma RN Methods
 - (void)subscribe:(NSString *)streamName;
@@ -46,6 +48,8 @@
 - (void)muteVideo;
 - (void)unmuteVideo;
 - (void)setPlaybackVolume:(int)value;
+- (void)setSharedObject;
+- (void)sharedObjectEvent:(NSDictionary*)messageIn;
 
 # pragma RN Properties
 - (BOOL)getShowDebugInfo;

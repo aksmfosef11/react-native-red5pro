@@ -45,6 +45,7 @@ public class R5VideoViewManager extends SimpleViewManager<R5VideoViewLayout> {
     private static final int COMMAND_MUTE_VIDEO = 10;
     private static final int COMMAND_UNMUTE_VIDEO = 11;
     private static final int COMMAND_SET_PLAYBACK_VOLUME = 12;
+    private static final int COMMAND_SET_SHARED_OBJECT = 13;
 
     public R5VideoViewLayout getmView() {
         return mView;
@@ -151,6 +152,9 @@ public class R5VideoViewManager extends SimpleViewManager<R5VideoViewLayout> {
                 final int value = args.getInt(0);
                 root.setPlaybackVolume(value/100);
 
+                break;
+            case COMMAND_SET_SHARED_OBJECT:
+                root.setSharedObject();
                 break;
             default:
                 super.receiveCommand(root, commandId, args);

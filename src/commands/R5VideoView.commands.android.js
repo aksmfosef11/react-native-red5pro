@@ -5,6 +5,10 @@ const { UIManager } = NativeModules
 const { R5VideoView } = UIManager
 const { Commands } = R5VideoView
 
+export const setSharedObject = (handle) => {
+  UIManager.dispatchViewManagerCommand(handle, Commands.setSharedObject, [])
+}
+
 export const subscribe = (handle, streamName) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.subscribe, [streamName])
 }

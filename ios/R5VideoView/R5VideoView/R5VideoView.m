@@ -264,6 +264,19 @@
   
 }
 
+- (void)setSharedObject{
+    NSString *name = @"7772";
+    R5Connection *con = [(R5StreamSubscriber *)_streamInstance connection];
+    self.sharedObject = [[R5SharedObject alloc] initWithName:name connection:con];
+    self.sharedObject.client = self;
+}
+
+-(void)sharedObjectEvent:(NSDictionary*)messageIn {
+    self.onReceiveSharedObjectEvent(messageIn);
+}
+
+
+
 - (void)swapCamera {
   
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -25,6 +25,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.internal.BundleJSONConverter;
 
 import com.red5pro.streaming.R5Connection;
 import com.red5pro.streaming.R5Stream;
@@ -32,6 +33,7 @@ import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.event.R5ConnectionListener;
 import com.red5pro.streaming.media.R5AudioController;
+import com.red5pro.streaming.R5SharedObject;
 import com.red5pro.streaming.source.R5AdaptiveBitrateController;
 import com.red5pro.streaming.source.R5Camera;
 import com.red5pro.streaming.source.R5Microphone;
@@ -58,6 +60,7 @@ public class R5VideoViewLayout extends FrameLayout
     protected R5Connection mConnection;
     protected R5Stream mStream;
     protected R5Camera mCamera;
+    protected R5SharedObject sharedObject;
 
     protected boolean mIsRestrainingVideo;
     protected boolean mIsBackgroundBound;
@@ -131,7 +134,8 @@ public class R5VideoViewLayout extends FrameLayout
         PUBLISHER_STATUS("onPublisherStreamStatus"),
         SUBSCRIBER_STATUS("onSubscriberStreamStatus"),
         UNPUBLISH_NOTIFICATION("onUnpublishNotification"),
-        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification");
+        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification"),
+        RECEIVE_SHARED_OBJECT_EVENT("onReceiveSharedObjectEvent");
 
         private final String mName;
 
@@ -159,7 +163,8 @@ public class R5VideoViewLayout extends FrameLayout
         UNMUTE_AUDIO("unmuteAudio", 9),
         MUTE_VIDEO("muteVideo", 10),
         UNMUTE_VIDEO("unmuteVideo", 11),
-        SET_PLAYBACK_VOLUME("setPlaybackVolume", 12);
+        SET_PLAYBACK_VOLUME("setPlaybackVolume", 12),
+        SET_SHARED_OBJECT("setSharedObject",13);
 
         private final String mName;
         private final int mValue;
@@ -484,6 +489,18 @@ public class R5VideoViewLayout extends FrameLayout
             cleanup();
         }
 
+    }
+
+    public void setSharedObject () {
+        sharedObject = new R5SharedObject("7774",((R5StreamSubscriber) mStreamInstance).mConnection);
+        sharedObject.client = this;
+    }
+
+    public void sharedObjectEvent(JSONObject messageIn) {
+        BundleJSONConverter bjc = new BundleJSONConverter();
+        Bundle bundle = bjc.convertToBundle(messageIn);
+        WritableMap map = Arguments.fromBundle(bundle);
+        mEventEmitter.receiveEvent(this.getId(), "onReceiveSharedObjectEvent", map);
     }
 
     public void swapCamera () {

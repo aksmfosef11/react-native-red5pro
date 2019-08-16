@@ -12,6 +12,7 @@ class R5VideoView extends React.Component {
     super(props)
     this._onMetaData = this._onMetaData.bind(this)
     this._onConfigured = this._onConfigured.bind(this)
+    this._onReceiveSharedObjectEvent = this._onReceiveSharedObjectEvent.bind(this)
     this._onPublisherStreamStatus = this._onPublisherStreamStatus.bind(this)
     this._onSubscriberStreamStatus = this._onSubscriberStreamStatus.bind(this)
     this._onUnpublishNotification = this._onUnpublishNotification.bind(this)
@@ -43,7 +44,13 @@ class R5VideoView extends React.Component {
     }
     this.props.onConfigured(event)
   }
-
+  
+  _onReceiveSharedObjectEvent = (event) => {
+    if (!this.props.onReceiveSharedObjectEvent) {
+      return
+    }
+    this.props.onReceiveSharedObjectEvent(event)
+  }
   _onPublisherStreamStatus = (event) => {
     if (!this.props.onPublisherStreamStatus) {
       return
@@ -89,6 +96,7 @@ class R5VideoView extends React.Component {
             onLayout={this._onLayout}
             onMetaDataEvent={this._onMetaData}
             onConfigured={this._onConfigured}
+            onReceiveSharedObjectEvent={this._onReceiveSharedObjectEvent}
             onPublisherStreamStatus={this._onPublisherStreamStatus}
             onSubscriberStreamStatus={this._onSubscriberStreamStatus}
             onUnsubscribeNotification={this._onUnsubscribeNotification}
@@ -131,6 +139,7 @@ R5VideoView.propTypes = {
       key: PropTypes.string.isRequired
     }).isRequired,
     onConfigured: PropTypes.func,
+    onReceiveSharedObjectEvent: PropTypes.func,
     onMetaDataEvent: PropTypes.func,
     onPublisherStreamStatus: PropTypes.func,
     onSubscriberStreamStatus: PropTypes.func,
