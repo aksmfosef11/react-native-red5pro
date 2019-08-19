@@ -190,6 +190,13 @@
   
 }
 
+- (void)setSharedObject{
+    NSString *name = @"7772";
+    R5Connection *con = [(R5StreamSubscriber *)_streamInstance connection];
+    self.sharedObject = [[R5SharedObject alloc] initWithName:name connection:con];
+    self.sharedObject.client = self;
+}
+
 - (void)updateScaleMode:(int)mode {
     
     dispatch_async(dispatch_get_main_queue(), ^{

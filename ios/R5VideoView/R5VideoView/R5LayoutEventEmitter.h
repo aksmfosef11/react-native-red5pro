@@ -16,5 +16,6 @@
 @property (nonatomic, copy) RCTBubblingEventBlock onSubscriberStreamStatus;
 @property (nonatomic, copy) RCTBubblingEventBlock onUnpublishNotification;
 @property (nonatomic, copy) RCTBubblingEventBlock onUnsubscribeNotification;
+@property (nonatomic, copy) RCTBubblingEventBlock onReceiveSharedObjectEvent;
 
 @end

@@ -73,7 +73,8 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		CONFIGURED("onConfigured"),
 		METADATA("onMetaDataEvent"),
 		SUBSCRIBER_STATUS("onSubscriberStreamStatus"),
-		UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification");
+		UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification"),
+		RECEIVE_SHARED_OBJECT_EVENT("onReceiveSharedObjectEvent");
 
 		private final String mName;
 

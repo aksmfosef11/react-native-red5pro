@@ -34,7 +34,8 @@ RCT_EXPORT_MODULE();
              @"onSubscriberStreamStatus",
              @"onUnsubscribeNotification",
              @"onPublisherStreamStatus",
-             @"onUnpublishNotification"];
+             @"onUnpublishNotification",
+             @"onReceiveSharedObjectEvent"];
 }
 
 -(void)startObserving {

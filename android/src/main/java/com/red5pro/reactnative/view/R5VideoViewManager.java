@@ -54,6 +54,7 @@ public class R5VideoViewManager extends SimpleViewManager<R5VideoViewLayout> imp
     private static final int COMMAND_SET_PLAYBACK_VOLUME = 12;
     private static final int COMMAND_DETACH = 13;
     private static final int COMMAND_ATTACH = 14;
+    private static final int COMMAND_SET_SHARED_OBJECT = 15;
 
     protected Map<String, R5StreamInstance> streamMap;
 
@@ -298,6 +299,9 @@ public class R5VideoViewManager extends SimpleViewManager<R5VideoViewLayout> imp
                     Log.d(TAG, "Could not attach. No matching stream with id:(" + attach_stream_id + ") stored.");
                 }
 
+                break;
+            case COMMAND_SET_SHARED_OBJECT:
+                root.setSharedObject();
                 break;
             default:
                 super.receiveCommand(root, commandId, args);

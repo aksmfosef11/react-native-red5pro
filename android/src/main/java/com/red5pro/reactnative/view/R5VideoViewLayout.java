@@ -77,7 +77,8 @@ public class R5VideoViewLayout extends FrameLayout
         PUBLISHER_STATUS("onPublisherStreamStatus"),
         SUBSCRIBER_STATUS("onSubscriberStreamStatus"),
         UNPUBLISH_NOTIFICATION("onUnpublishNotification"),
-        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification");
+        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification"),
+        RECEIVE_SHARED_OBJECT_EVENT("onReceiveSharedObjectEvent");
 
         private final String mName;
 
@@ -107,7 +108,8 @@ public class R5VideoViewLayout extends FrameLayout
         UNMUTE_VIDEO("unmuteVideo", 11),
         SET_PLAYBACK_VOLUME("setPlaybackVolume", 12),
         DETACH("detach", 13),
-        ATTACH("attach", 14);
+        ATTACH("attach", 14),
+        SET_SHARED_OBJECT("setSharedObject",15);
 
         private final String mName;
         private final int mValue;
@@ -286,6 +288,12 @@ public class R5VideoViewLayout extends FrameLayout
             ((R5StreamPublisher) mStreamInstance).unmuteVideo();
         }
     }
+
+    public void setSharedObject () {
+        sharedObject = new R5SharedObject("7774",((R5StreamSubscriber) mStreamInstance).mConnection);
+        sharedObject.client = this;
+    }
+
 
     public void updateScaleSize(final int width, final int height, final int screenWidth, final int screenHeight) {
 
