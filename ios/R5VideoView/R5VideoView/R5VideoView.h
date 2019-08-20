@@ -23,7 +23,6 @@
 @property R5Connection *connection;
 @property R5Configuration *configuration;
 @property R5VideoViewController *controller;
-@property R5SharedObject *sharedObject;
 
 - (void)loadConfiguration:(R5Configuration *)configuration forKey:(NSString *)key andAttach:(BOOL)autoAttach;
 

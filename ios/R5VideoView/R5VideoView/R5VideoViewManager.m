@@ -287,18 +287,6 @@ RCT_EXPORT_METHOD(detach:(nonnull NSNumber *)reactTag withId:(NSString* )streamI
 }
 
 
-RCT_EXPORT_METHOD(setSharedObject:(nonnull NSNumber *)reactTag) {
-    
-    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, R5VideoView *> *viewRegistry) {
-        R5VideoView *view = viewRegistry[reactTag];
-        if (![view isKindOfClass:[R5VideoView class]]) {
-            RCTLogError(@"Invalid view returned from registry, expecting R5VideoView, got: %@", view);
-        } else {
-            [view setSharedObject];
-        }
-    }];
-    
-}
 
 
 # pragma RN Properties

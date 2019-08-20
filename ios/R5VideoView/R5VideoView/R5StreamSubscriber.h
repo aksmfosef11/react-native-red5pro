@@ -18,10 +18,23 @@
 @property R5Stream *stream;
 @property R5Connection *connection;
 @property R5Configuration *configuration;
+@property R5SharedObject *sharedObject;
 
 - (id)initWithDeviceEmitter:(RCTEventEmitter *)emitter;
 - (void)subscribe:(R5Configuration *)configuration andProps:(NSDictionary *)props;
 - (void)unsubscribe;
 - (void)setPlaybackVolume:(int)value;
+- (void)notReceiveStory:(NSMutableDictionary*)messageIn;
+- (void)followerCountUp:(NSMutableDictionary*)messageIn;
+- (void)followerCountDown:(NSMutableDictionary*)messageIn;
+- (void)modifyBroadcast:(NSMutableDictionary*)messageIn;
+- (void)endBroadcast:(NSMutableDictionary*)messageIn;
+- (void)receiveStory:(NSMutableDictionary*)messageIn;
+- (void)unMute:(NSMutableDictionary*)messageIn;
+- (void)mute:(NSMutableDictionary*)messageIn;
+- (void)subScribersUpdate:(NSMutableDictionary*)messageIn;
+- (void)hideBroadStory:(NSMutableDictionary*)messageIn;
+- (void)showBroadStory:(NSMutableDictionary*)messageIn;
+- (void)showBroadWorry:(NSMutableDictionary*)messageIn;
 
 @end

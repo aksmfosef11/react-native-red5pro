@@ -285,8 +285,9 @@
 				DEVELOPMENT_TEAM = E964K44BWW;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../../example/ios/Frameworks",
+					"/Users/junholee/Downloads/nagiji-rn/ios/Frameworks/",
 				);
+				GCC_NO_COMMON_BLOCKS = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -301,8 +302,9 @@
 				DEVELOPMENT_TEAM = E964K44BWW;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../../example/ios/Frameworks",
+					"/Users/junholee/Downloads/nagiji-rn/ios/Frameworks/",
 				);
+				GCC_NO_COMMON_BLOCKS = NO;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

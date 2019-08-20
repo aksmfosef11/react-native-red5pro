@@ -172,6 +172,9 @@
     
 }
 
+
+
+
 - (void)onWillResignActive:(NSNotification *)notification {
     [self sendToBackground];
 }
@@ -186,6 +189,89 @@
 - (void) setEmitter:(NSObject<R5LayoutEventEmitter> *)emitter {
     self.viewEmitter = emitter;
 }
+
+- (void)createSharedObject:(NSString *)streamName{
+    self.sharedObject = [[R5SharedObject alloc] initWithName:streamName connection:self.connection];
+    self.sharedObject.client = self;
+}
+
+- (void)closeSharedObject{
+    [self.sharedObject close];
+}
+
+- (void)notReceiveStory:(NSMutableDictionary *)messageIn {
+
+    messageIn[@"type"] = @"notReceiveStory";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)followerCountUp:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountUp";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)followerCountDown:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountDown";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)modifyBroadcast:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"modifyBroadcast";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)endBroadcast:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"endBroadcast";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)receiveStory:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"receiveStory";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)unMute:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"unMute";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)mute:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"mute";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)subScribersUpdate:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"subScribersUpdate";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)hideBroadStory:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"hideBroadStory";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)showBroadStory:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"showBroadStory";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)showBroadWorry:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"showBroadWorry";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+
 
 - (void) setVideoView:(R5VideoViewController *)view {
     
@@ -242,6 +328,7 @@
     
     if (statusCode == r5_status_start_streaming) {
         _isStreaming = YES;
+    
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{

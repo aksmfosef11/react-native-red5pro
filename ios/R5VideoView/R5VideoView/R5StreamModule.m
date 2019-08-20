@@ -312,6 +312,28 @@ RCT_REMAP_METHOD(setPlaybackVolume,
     
 }
 
+RCT_EXPORT_METHOD(setSharedObject:(nonnull NSString *)streamId streamName:(nonnull NSString *)streamName) {
+    RCTLogInfo(@"R5StreamModule:setSharedObject() %@", streamName);
+    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
+    if (item != nil) {
+        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
+        if (streamInstance != nil) {
+            [(R5StreamSubscriber *)streamInstance createSharedObject:streamName];
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(closeSharedObject:(nonnull NSString *)streamId) {
+    RCTLogInfo(@"R5StreamModule:setSharedObject() %@", streamId);
+    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
+    if (item != nil) {
+        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
+        if (streamInstance != nil) {
+            [(R5StreamSubscriber *)streamInstance closeSharedObject];
+        }
+    }
+}
+
 +(NSMutableDictionary *)streamMap {
     if (_streamMap == nil) {
         _streamMap = [[NSMutableDictionary alloc] init];

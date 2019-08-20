@@ -11,10 +11,14 @@
 
 @protocol R5StreamInstance <NSObject>
 
+
+
 - (NSObject<R5LayoutEventEmitter> *) getEmitter;
 - (void) setEmitter:(NSObject<R5LayoutEventEmitter> *)emitter;
 - (void) setVideoView:(R5VideoViewController *)view;
 - (void) removeVideoView:(R5VideoViewController *)view;
 - (void) updateLogLevel:(int)level;
+- (void) createSharedObject:(NSString *)streamName;
+- (void) closeSharedObject;
 
 @end
