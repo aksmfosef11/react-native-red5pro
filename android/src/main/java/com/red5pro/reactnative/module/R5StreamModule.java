@@ -237,6 +237,32 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 		Log.d(TAG, "Could not unmute video on broadcast. Stream :id(" + streamId + ") not found.");
 	}
 
+	@ReactMethod
+	public void setSharedObject (String streamId,String streamName) {
+		if (streamMap.containsKey(streamId)) {
+			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
+			R5StreamItem item = streamMap.get(streamId);
+			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+			if (instance != null) {
+				instance.createSharedObject(streamName);
+				return;
+			}
+		}
+	}
+
+	@ReactMethod
+	public void closeSharedObject (String streamId) {
+		if (streamMap.containsKey(streamId)) {
+			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
+			R5StreamItem item = streamMap.get(streamId);
+			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+			if (instance != null) {
+				instance.closeSharedObject();
+				return;
+			}
+		}
+	}
+
 	public R5StreamInstance getStreamInstance (String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "getStreamInstance(" + streamId + ")");

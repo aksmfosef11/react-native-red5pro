@@ -300,9 +300,6 @@ public class R5VideoViewManager extends SimpleViewManager<R5VideoViewLayout> imp
                 }
 
                 break;
-            case COMMAND_SET_SHARED_OBJECT:
-                root.setSharedObject();
-                break;
             default:
                 super.receiveCommand(root, commandId, args);
                 break;

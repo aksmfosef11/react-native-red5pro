@@ -22,6 +22,7 @@ import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.reactnative.view.SubscribeService;
 import com.red5pro.streaming.R5Connection;
 import com.red5pro.streaming.R5Stream;
+import com.red5pro.streaming.R5SharedObject;
 import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.media.R5AudioController;
@@ -41,6 +42,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	private R5Configuration mConfiguration;
 	private R5Connection mConnection;
 	private R5Stream mStream;
+	private R5SharedObject mSharedObject;
 
 	private int mLogLevel = 3;
 	private int mAudioMode = 0;
@@ -300,6 +302,15 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		if (view != null) {
 			view.attachStream(null);
 		}
+	}
+
+	public void createSharedObject (String streamName) {
+		mSharedObject = new R5SharedObject(streamName,this.mConnection);
+		mSharedObject.client = this;
+	}
+	
+	public void closeSharedObject () {
+		mSharedObject.close();
 	}
 
 	protected void setSubscriberDisplayOn (Boolean setOn) {
