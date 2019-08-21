@@ -17,6 +17,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.internal.BundleJSONConverter;
 import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.reactnative.view.SubscribeService;
@@ -27,6 +28,7 @@ import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.media.R5AudioController;
 import com.red5pro.streaming.view.R5VideoView;
+
 
 public class R5StreamSubscriber implements R5StreamInstance,
 		SubscribeService.SubscribeServicable {
@@ -311,6 +313,55 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	
 	public void closeSharedObject () {
 		mSharedObject.close();
+	}
+
+	public WritableMap jsonToMap (JSONObject objectValue){
+		BundleJSONConverter bjc = new BundleJSONConverter();
+		Bundle bundle = bjc.convertToBundle(objectValue);
+		return Arguments.fromBundle(bundle);
+	}
+
+	private void sendSharedObjectEvent(String type,WriteableMap map){
+
+		map.putString("type",type);
+		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
+	}
+
+	public void notReceiveStory(JSONObject objectValue){
+		sendSharedObjectEvent("notReceiveStory",jsonToMap(objectValue));
+	}
+public void followerCountUp(JSONObject objectValue) {
+	sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+	}
+public void followerCountDown(JSONObject objectValue) {
+	sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
+	}
+public void modifyBroadcast(JSONObject objectValue) {
+	sendSharedObjectEvent("modifyBroadcast",jsonToMap(objectValue));
+	}
+public void endBroadcast(JSONObject objectValue) {
+	sendSharedObjectEvent("endBroadcast",jsonToMap(objectValue));
+	}
+public void receiveStory(JSONObject objectValue) {
+	sendSharedObjectEvent("receiveStory",jsonToMap(objectValue));
+	}
+public void unMute(JSONObject objectValue) {
+	sendSharedObjectEvent("unMute",jsonToMap(objectValue));
+	}
+public void mute(JSONObject objectValue) {
+	sendSharedObjectEvent("mute",jsonToMap(objectValue));
+	}
+public void subScribersUpdate(JSONObject objectValue) {
+	sendSharedObjectEvent("subScribersUpdate",jsonToMap(objectValue));
+	}
+public void hideBroadStory(JSONObject objectValue) {
+	sendSharedObjectEvent("hideBroadStory",jsonToMap(objectValue));
+	}
+public void showBroadStory(JSONObject objectValue) {
+	sendSharedObjectEvent("showBroadStory",jsonToMap(objectValue));
+	}
+public void showBroadWorry(JSONObject objectValue) {
+	sendSharedObjectEvent("showBroadWorry",jsonToMap(objectValue));
 	}
 
 	protected void setSubscriberDisplayOn (Boolean setOn) {
