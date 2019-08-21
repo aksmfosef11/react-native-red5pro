@@ -2,10 +2,6 @@ import { NativeModules } from 'react-native'
 import R5PublishType from '../enum/R5VideoView.publishtype'
 const { UIManager } = NativeModules
 
-export const setSharedObject = (handle) => {
-  UIManager.dispatchViewManagerCommand(handle, UIManager.R5VideoView.Commands.setSharedObject, null)
-}
-
 export const subscribe = (handle, streamName) => {
   UIManager.dispatchViewManagerCommand(handle, UIManager.R5VideoView.Commands.subscribe, [streamName])
 }
