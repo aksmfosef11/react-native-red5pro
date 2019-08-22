@@ -17,6 +17,7 @@
 @property R5Stream *stream;
 @property R5Connection *connection;
 @property R5Configuration *configuration;
+@property R5SharedObject *sharedObject;
 
 - (id)initWithDeviceEmitter:(RCTEventEmitter *)emitter;
 - (void)publish:(R5Configuration *)configuration withType:(int)type andProps:(NSDictionary *)props;
@@ -28,5 +29,7 @@
 - (void)unmuteAudio;
 - (void)muteVideo;
 - (void)unmuteVideo;
+- (void)followerCountUp:(NSMutableDictionary*)messageIn;
+- (void)followerCountDown:(NSMutableDictionary*)messageIn;
 
 @end

@@ -351,6 +351,39 @@
     
 }
 
+- (void)createSharedObject:(NSString *)streamName{
+    self.sharedObject = [[R5SharedObject alloc] initWithName:streamName connection:self.connection];
+    self.sharedObject.client = self;
+}
+
+- (void)closeSharedObject{
+    [self.sharedObject close];
+}
+
+- (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {
+    
+    messageIn[@"type"] = @"onSharedObjectConnect";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)followerCountUp:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountUp";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)followerCountDown:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountDown";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
+    if (self.sharedObject != nil){
+        [self.sharedObject send:eventName withParams:param];
+    }
+}
+
 - (void)sendToBackground {
     
     if (!_enableBackgroundStreaming) {

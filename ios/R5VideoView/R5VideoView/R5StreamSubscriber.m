@@ -116,7 +116,7 @@
 }
 
 - (void)subscribe:(R5Configuration *)configuration andProps:(NSDictionary *)props {
-
+    
     [self unpackProps:props];
     r5_set_log_level(_logLevel);
     
@@ -199,8 +199,15 @@
     [self.sharedObject close];
 }
 
-- (void)notReceiveStory:(NSMutableDictionary *)messageIn {
 
+- (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {
+    
+    messageIn[@"type"] = @"onSharedObjectConnect";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
+- (void)notReceiveStory:(NSMutableDictionary *)messageIn {
+    
     messageIn[@"type"] = @"notReceiveStory";
     [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
 }
@@ -271,28 +278,34 @@
     [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
 }
 
+- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
+    if (self.sharedObject != nil){
+        [self.sharedObject send:eventName withParams:param];
+    }
+}
+
 
 
 - (void) setVideoView:(R5VideoViewController *)view {
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.stream != nil && _playbackVideo) {
-            [view showDebugInfo:_showDebugInfo];
-            [view attachStream:self.stream];
-        }
-//    });
-
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.stream != nil && _playbackVideo) {
+        [view showDebugInfo:_showDebugInfo];
+        [view attachStream:self.stream];
+    }
+    //    });
+    
 }
 
 - (void) removeVideoView:(R5VideoViewController *)view {
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.stream != nil) {
-            [view showDebugInfo:NO];
-            //            [view removeStream]; // NOTE: Requires iOS SDK 5.3.0 or higher.
-            [view attachStream:nil];
-        }
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.stream != nil) {
+        [view showDebugInfo:NO];
+        //            [view removeStream]; // NOTE: Requires iOS SDK 5.3.0 or higher.
+        [view attachStream:nil];
+    }
+    //    });
     
 }
 
@@ -328,7 +341,7 @@
     
     if (statusCode == r5_status_start_streaming) {
         _isStreaming = YES;
-    
+        
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{

@@ -318,7 +318,7 @@ RCT_EXPORT_METHOD(setSharedObject:(nonnull NSString *)streamId streamName:(nonnu
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
-            [(R5StreamSubscriber *)streamInstance createSharedObject:streamName];
+            [streamInstance createSharedObject:streamName];
         }
     }
 }
@@ -329,7 +329,7 @@ RCT_EXPORT_METHOD(closeSharedObject:(nonnull NSString *)streamId) {
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
-            [(R5StreamSubscriber *)streamInstance closeSharedObject];
+            [streamInstance closeSharedObject];
         }
     }
 }
