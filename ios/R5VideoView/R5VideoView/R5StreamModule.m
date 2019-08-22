@@ -334,6 +334,16 @@ RCT_EXPORT_METHOD(closeSharedObject:(nonnull NSString *)streamId) {
     }
 }
 
+RCT_EXPORT_METHOD(sendSharedObjectEvent:(nonnull NSString *)streamId eventName:(nonnull NSString *)eventName param:(nonnull NSDictionary *)param) {
+    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
+    if (item != nil) {
+        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
+        if (streamInstance != nil) {
+            [streamInstance sendSharedObjectEvent:eventName param:param];
+        }
+    }
+}
+
 +(NSMutableDictionary *)streamMap {
     if (_streamMap == nil) {
         _streamMap = [[NSMutableDictionary alloc] init];

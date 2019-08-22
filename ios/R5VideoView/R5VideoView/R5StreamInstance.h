@@ -20,5 +20,6 @@
 - (void) updateLogLevel:(int)level;
 - (void) createSharedObject:(NSString *)streamName;
 - (void) closeSharedObject;
+- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param;
 
 @end
