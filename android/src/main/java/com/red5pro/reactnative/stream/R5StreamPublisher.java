@@ -19,6 +19,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.red5pro.reactnative.util.JSONUtil;
 import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.streaming.R5Connection;
@@ -31,6 +32,9 @@ import com.red5pro.streaming.source.R5AdaptiveBitrateController;
 import com.red5pro.streaming.source.R5Camera;
 import com.red5pro.streaming.source.R5Microphone;
 import com.red5pro.streaming.view.R5VideoView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class R5StreamPublisher implements R5StreamInstance,
 		PublishService.PublishServicable {
@@ -204,6 +208,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 		if(!found){
 			Log.d(TAG, "detectStartService:start()");
 			mContext.getCurrentActivity().startService(intent);
+			doPublish(mConfiguration.getStreamName(), mStreamType);
 		}
 
 		Log.d(TAG, "detectStartService:bind()");
@@ -291,6 +296,12 @@ public class R5StreamPublisher implements R5StreamInstance,
 		}
 
 		if (mStream != null && mIsStreaming) {
+			this.setPublisherDisplayOn(false, true);
+			Activity activity = mContext.getCurrentActivity();
+			if (mPubishIntent != null && mIsBackgroundBound) {
+				activity.unbindService(mPublishServiceConnection);
+				activity.stopService(mPubishIntent);
+			}
 			mStream.stop();
 		} else {
 			WritableMap map = Arguments.createMap();
@@ -626,6 +637,37 @@ public class R5StreamPublisher implements R5StreamInstance,
 			mStream.updateStreamMeta();
 		}
 
+	}
+
+	public WritableMap jsonToMap (JSONObject objectValue){
+		JSONUtil bjc = new JSONUtil();
+		WritableMap map = null;
+		try {
+			map = bjc.convertJsonToMap(objectValue);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+
+	private void sendSharedObjectEvent(String type,WritableMap map){
+
+		map.putString("type",type);
+		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
+	}
+
+	public void followerCountUp(JSONObject objectValue) {
+		sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+	}
+	public void followerCountDown(JSONObject objectValue) {
+		sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
+	}
+
+	public void addBroadStory(JSONObject objectValue) {
+		sendSharedObjectEvent("addBroadStory",jsonToMap(objectValue));
+	}
+	public void onSharedObjectConnect(JSONObject objectValue) {
+		sendSharedObjectEvent("onSharedObjectConnect",jsonToMap(objectValue));
 	}
 
 	protected void setPublisherDisplayOn (Boolean setOn, Boolean useService) {

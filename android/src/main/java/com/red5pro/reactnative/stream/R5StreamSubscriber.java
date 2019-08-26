@@ -128,7 +128,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void detectToStartService (Intent intent, ServiceConnection connection) {
+	protected void detectToStartService (Intent intent, ServiceConnection connection,String streamName) {
 		Log.d(TAG, "detectStartService()");
 		boolean found = false;
 		Activity activity = mContext.getCurrentActivity();
@@ -144,11 +144,13 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		if(!found){
 			Log.d(TAG, "detectStartService:start()");
 			mContext.getCurrentActivity().startService(intent);
+			mStream.play(streamName);
 		}
 
 		Log.d(TAG, "detectStartService:bind()");
 		activity.bindService(intent, connection, Context.BIND_IMPORTANT);
 		mIsBackgroundBound = true;
+
 	}
 
 	protected void establishConnection(R5Configuration configuration,
@@ -256,7 +258,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 			// Set up service and offload setup.
 			mEnableBackgroundStreaming = true;
 			mSubscribeIntent = new Intent(mContext.getCurrentActivity(), SubscribeService.class);
-			detectToStartService(mSubscribeIntent, mSubscribeServiceConnection);
+			detectToStartService(mSubscribeIntent, mSubscribeServiceConnection,configuration.getStreamName());
 			return this;
 		}
 
@@ -268,8 +270,14 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void unsubscribe () {
 
 		if (mStream != null && mIsStreaming) {
+			Activity activity = mContext.getCurrentActivity();
+			if (mSubscribeIntent != null) {
+				activity.unbindService(mSubscribeServiceConnection);
+				activity.stopService(mSubscribeIntent);
+			}
 			mStream.stop();
 		}
+
 		else {
 			WritableMap map = Arguments.createMap();
 			this.emitEvent(R5VideoViewLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), map);

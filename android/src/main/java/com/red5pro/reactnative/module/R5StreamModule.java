@@ -26,7 +26,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	private static final String REACT_CLASS = "R5StreamModule";
 
 	private static final String E_CONFIGURATION_ERROR = "E_CONFIGURATION_ERROR";
-    private static final String E_STREAM_ERROR = "E_STREAM_ERROR";
+	private static final String E_STREAM_ERROR = "E_STREAM_ERROR";
 
 	private static final String PROP_HOST = "host";
 	private static final String PROP_PORT = "port";
@@ -99,7 +99,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 			R5StreamInstance instance = new R5StreamSubscriber(this.getReactApplicationContext());
 			item.setInstance(instance);
 			((R5StreamSubscriber) instance).subscribe(item.getConfiguration(),
-                    props);
+					props);
 			promise.resolve(streamId);
 		} else {
 			promise.reject(E_CONFIGURATION_ERROR, "Stream Configuration with id(" + streamId + ") does not exist.");
@@ -118,7 +118,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 				return;
 			}
 		}
-        promise.reject(E_STREAM_ERROR, "Stream with id(" + streamId + ") not found.");
+		promise.reject(E_STREAM_ERROR, "Stream with id(" + streamId + ") not found.");
 	}
 
 	@ReactMethod
@@ -154,18 +154,18 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-    public void setPlaybackVolume (String streamId, int value) {
-        if (streamMap.containsKey(streamId)) {
-            Log.d(TAG, "setPlaybackVolume:id(" + streamId + ") = " + value);
-            R5StreamItem item = streamMap.get(streamId);
-            R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
-            if (instance != null) {
-                instance.setPlaybackVolume(value/100);
-                return;
-            }
-        }
-        Log.d(TAG, "Could not set playback volume. Stream :id(" + streamId + ") not found.");
-    }
+	public void setPlaybackVolume (String streamId, int value) {
+		if (streamMap.containsKey(streamId)) {
+			Log.d(TAG, "setPlaybackVolume:id(" + streamId + ") = " + value);
+			R5StreamItem item = streamMap.get(streamId);
+			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+			if (instance != null) {
+				instance.setPlaybackVolume(value/100);
+				return;
+			}
+		}
+		Log.d(TAG, "Could not set playback volume. Stream :id(" + streamId + ") not found.");
+	}
 
 	@ReactMethod
 	public void swapCamera (String streamId) {
@@ -242,7 +242,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
-			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+			R5StreamInstance instance = item.getInstance();
 			if (instance != null) {
 				instance.createSharedObject(streamName);
 				return;
@@ -255,7 +255,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
-			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+			R5StreamInstance instance = item.getInstance();
 			if (instance != null) {
 				instance.closeSharedObject();
 				return;
