@@ -22,6 +22,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.streaming.R5Connection;
+import com.red5pro.streaming.R5SharedObject;
 import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
@@ -77,6 +78,8 @@ public class R5StreamPublisher implements R5StreamInstance,
 	private boolean mEnableBackgroundStreaming;
 	protected PublishService mBackgroundPublishService;
 	private Intent mPubishIntent;
+	private R5SharedObject mSharedObject;
+
 
 	private ServiceConnection mPublishServiceConnection = new ServiceConnection() {
 		@Override
@@ -446,6 +449,17 @@ public class R5StreamPublisher implements R5StreamInstance,
 		if (mStream != null) {
 			mStream.setScaleMode(mode);
 		}
+	}
+
+	@Override
+	public void createSharedObject(String streamName) {
+		mSharedObject = new R5SharedObject(streamName,this.mConnection);
+		mSharedObject.client = this;
+	}
+
+	@Override
+	public void closeSharedObject() {
+		mSharedObject.close();
 	}
 
 	public void updateLogLevel(int level) {

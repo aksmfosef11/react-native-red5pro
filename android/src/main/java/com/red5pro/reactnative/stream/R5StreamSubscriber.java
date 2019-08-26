@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -17,7 +18,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.facebook.internal.BundleJSONConverter;
+import com.red5pro.reactnative.util.JSONUtil;
 import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.reactnative.view.SubscribeService;
@@ -28,6 +29,9 @@ import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.media.R5AudioController;
 import com.red5pro.streaming.view.R5VideoView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class R5StreamSubscriber implements R5StreamInstance,
@@ -148,9 +152,9 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	}
 
 	protected void establishConnection(R5Configuration configuration,
-									 int audioMode,
-									 int logLevel,
-									 int scaleMode) {
+									   int audioMode,
+									   int logLevel,
+									   int scaleMode) {
 
 		R5AudioController.mode = audioMode == 1
 				? R5AudioController.PlaybackMode.STANDARD
@@ -204,19 +208,19 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-    public R5StreamSubscriber subscribe (R5Configuration configuration,
-                                         boolean playbackVideo,
-                                         boolean enableBackground,
-                                         int audioMode,
-                                         int logLevel,
-                                         int scaleMode) {
+	public R5StreamSubscriber subscribe (R5Configuration configuration,
+										 boolean playbackVideo,
+										 boolean enableBackground,
+										 int audioMode,
+										 int logLevel,
+										 int scaleMode) {
 
-        return subscribe(configuration, playbackVideo, enableBackground,
-                audioMode, logLevel, scaleMode, false);
+		return subscribe(configuration, playbackVideo, enableBackground,
+				audioMode, logLevel, scaleMode, false);
 
-    }
+	}
 
-    public R5StreamSubscriber subscribe (R5Configuration configuration, R5StreamProps props) {
+	public R5StreamSubscriber subscribe (R5Configuration configuration, R5StreamProps props) {
 
 		Log.d(TAG, props.toString());
 		return subscribe(configuration,
@@ -236,7 +240,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 										 int audioMode,
 										 int logLevel,
 										 int scaleMode,
-                                         boolean showDebugView) {
+										 boolean showDebugView) {
 
 		mLogLevel = logLevel;
 		mAudioMode = audioMode;
@@ -298,7 +302,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void removeVideoView (R5VideoView view) {
 		Log.d(TAG, "removeVideoView()");
 		if (mStream != null) {
-            view.showDebugView(false);
+			view.showDebugView(false);
 			mStream.deactivate_display();
 		}
 		if (view != null) {
@@ -310,18 +314,23 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		mSharedObject = new R5SharedObject(streamName,this.mConnection);
 		mSharedObject.client = this;
 	}
-	
+
 	public void closeSharedObject () {
 		mSharedObject.close();
 	}
 
 	public WritableMap jsonToMap (JSONObject objectValue){
-		BundleJSONConverter bjc = new BundleJSONConverter();
-		Bundle bundle = bjc.convertToBundle(objectValue);
-		return Arguments.fromBundle(bundle);
+		JSONUtil bjc = new JSONUtil();
+		WritableMap map = null;
+		try {
+			map = bjc.convertJsonToMap(objectValue);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return map;
 	}
 
-	private void sendSharedObjectEvent(String type,WriteableMap map){
+	private void sendSharedObjectEvent(String type,WritableMap map){
 
 		map.putString("type",type);
 		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
@@ -330,38 +339,38 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void notReceiveStory(JSONObject objectValue){
 		sendSharedObjectEvent("notReceiveStory",jsonToMap(objectValue));
 	}
-public void followerCountUp(JSONObject objectValue) {
-	sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+	public void followerCountUp(JSONObject objectValue) {
+		sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
 	}
-public void followerCountDown(JSONObject objectValue) {
-	sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
+	public void followerCountDown(JSONObject objectValue) {
+		sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
 	}
-public void modifyBroadcast(JSONObject objectValue) {
-	sendSharedObjectEvent("modifyBroadcast",jsonToMap(objectValue));
+	public void modifyBroadcast(JSONObject objectValue) {
+		sendSharedObjectEvent("modifyBroadcast",jsonToMap(objectValue));
 	}
-public void endBroadcast(JSONObject objectValue) {
-	sendSharedObjectEvent("endBroadcast",jsonToMap(objectValue));
+	public void endBroadcast(JSONObject objectValue) {
+		sendSharedObjectEvent("endBroadcast",jsonToMap(objectValue));
 	}
-public void receiveStory(JSONObject objectValue) {
-	sendSharedObjectEvent("receiveStory",jsonToMap(objectValue));
+	public void receiveStory(JSONObject objectValue) {
+		sendSharedObjectEvent("receiveStory",jsonToMap(objectValue));
 	}
-public void unMute(JSONObject objectValue) {
-	sendSharedObjectEvent("unMute",jsonToMap(objectValue));
+	public void unMute(JSONObject objectValue) {
+		sendSharedObjectEvent("unMute",jsonToMap(objectValue));
 	}
-public void mute(JSONObject objectValue) {
-	sendSharedObjectEvent("mute",jsonToMap(objectValue));
+	public void mute(JSONObject objectValue) {
+		sendSharedObjectEvent("mute",jsonToMap(objectValue));
 	}
-public void subScribersUpdate(JSONObject objectValue) {
-	sendSharedObjectEvent("subScribersUpdate",jsonToMap(objectValue));
+	public void subScribersUpdate(JSONObject objectValue) {
+		sendSharedObjectEvent("subScribersUpdate",jsonToMap(objectValue));
 	}
-public void hideBroadStory(JSONObject objectValue) {
-	sendSharedObjectEvent("hideBroadStory",jsonToMap(objectValue));
+	public void hideBroadStory(JSONObject objectValue) {
+		sendSharedObjectEvent("hideBroadStory",jsonToMap(objectValue));
 	}
-public void showBroadStory(JSONObject objectValue) {
-	sendSharedObjectEvent("showBroadStory",jsonToMap(objectValue));
+	public void showBroadStory(JSONObject objectValue) {
+		sendSharedObjectEvent("showBroadStory",jsonToMap(objectValue));
 	}
-public void showBroadWorry(JSONObject objectValue) {
-	sendSharedObjectEvent("showBroadWorry",jsonToMap(objectValue));
+	public void showBroadWorry(JSONObject objectValue) {
+		sendSharedObjectEvent("showBroadWorry",jsonToMap(objectValue));
 	}
 
 	protected void setSubscriberDisplayOn (Boolean setOn) {
