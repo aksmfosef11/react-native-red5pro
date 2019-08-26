@@ -54,7 +54,7 @@
 }
 
 - (id)init {
-
+    
     if ([super init] != nil) {
         [self addObservers];
     }
@@ -132,7 +132,7 @@
     _streamName = nil;
     _isStreaming = NO;
     self.stream = nil;
-
+    
     _hasExplicitlyPausedVideo = NO;
     [self removeObservers];
     [self setEmitter:nil];
@@ -308,7 +308,7 @@
         
         R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
         UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-            
+        
         if (orientation == UIDeviceOrientationPortraitUpsideDown) {
             [camera setOrientation: 270];
         }
@@ -378,6 +378,12 @@
     [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
 }
 
+- (void)addBroadStory:(NSMutableDictionary *)messageIn{
+    
+    messageIn[@"type"] = @"addBroadStory";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+}
+
 - (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
     if (self.sharedObject != nil){
         [self.sharedObject send:eventName withParams:param];
@@ -430,25 +436,25 @@
 
 - (void) setVideoView:(R5VideoViewController *)view {
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.stream != nil && _useVideo) {
-            [view showDebugInfo:_showDebugInfo];
-            [view attachStream:self.stream];
-            [self.stream updateStreamMeta];
-        }
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.stream != nil && _useVideo) {
+        [view showDebugInfo:_showDebugInfo];
+        [view attachStream:self.stream];
+        [self.stream updateStreamMeta];
+    }
+    //    });
     
 }
 
 - (void) removeVideoView:(R5VideoViewController *)view {
     
-//    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.stream != nil) {
-            [view showDebugInfo:NO];
-//            [view attachStream:nil];
-            [self.stream updateStreamMeta];
-        }
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.stream != nil) {
+        [view showDebugInfo:NO];
+        //            [view attachStream:nil];
+        [self.stream updateStreamMeta];
+    }
+    //    });
     
 }
 
@@ -458,7 +464,7 @@
 }
 
 - (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
-
+    
     if (self.viewEmitter != nil) {
         if ([eventName isEqualToString:@"onMetaDataEvent"]) {
             self.viewEmitter.onMetaDataEvent(body);
@@ -504,7 +510,7 @@
 
 # pragma R5Stream:client
 - (void)onMetaData:(NSString *)params {
-   
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self emitEvent:@"onMetaDataEvent" withBody:@{@"metadata": params}];
     });
