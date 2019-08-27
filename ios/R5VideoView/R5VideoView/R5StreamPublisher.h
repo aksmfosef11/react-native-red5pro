@@ -31,5 +31,8 @@
 - (void)unmuteVideo;
 - (void)followerCountUp:(NSMutableDictionary*)messageIn;
 - (void)followerCountDown:(NSMutableDictionary*)messageIn;
+- (void)addBroadStory:(NSMutableDictionary*)messageIn;
+
+
 
 @end
