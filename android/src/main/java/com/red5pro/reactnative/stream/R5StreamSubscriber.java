@@ -6,13 +6,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -23,8 +23,8 @@ import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
 import com.red5pro.reactnative.view.SubscribeService;
 import com.red5pro.streaming.R5Connection;
-import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.R5SharedObject;
+import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.media.R5AudioController;
@@ -66,9 +66,10 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "connection:onServiceConnected()");
-			mBackgroundSubscribeService = ((SubscribeService.SubscribeServiceBinder)service).getService();
+			mBackgroundSubscribeService = ((SubscribeService.SubscribeServiceBinder) service).getService();
 			mBackgroundSubscribeService.setServicableDelegate(R5StreamSubscriber.this);
 		}
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			Log.d(TAG, "connection:onServiceDisconnected()");
@@ -97,14 +98,14 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	public R5StreamSubscriber (ThemedReactContext context) {
+	public R5StreamSubscriber(ThemedReactContext context) {
 		Log.d(TAG, "new()");
 		this.mContext = context;
 		this.mContext.addLifecycleEventListener(this);
 		this.deviceEventEmitter = mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 	}
 
-	public R5StreamSubscriber (ReactApplicationContext context) {
+	public R5StreamSubscriber(ReactApplicationContext context) {
 		Log.d(TAG, "new()");
 		this.mContext = context;
 		this.mContext.addLifecycleEventListener(this);
@@ -128,7 +129,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void detectToStartService (Intent intent, ServiceConnection connection,String streamName) {
+	protected void detectToStartService(Intent intent, ServiceConnection connection, String streamName) {
 		Log.d(TAG, "detectStartService()");
 		boolean found = false;
 		Activity activity = mContext.getCurrentActivity();
@@ -139,9 +140,10 @@ public class R5StreamSubscriber implements R5StreamInstance,
 					found = true;
 				}
 			}
-		} catch (NullPointerException e){}
+		} catch (NullPointerException e) {
+		}
 
-		if(!found){
+		if (!found) {
 			Log.d(TAG, "detectStartService:start()");
 			mContext.getCurrentActivity().startService(intent);
 			mStream.play(streamName);
@@ -174,7 +176,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void doSubscribe (String streamName) {
+	protected void doSubscribe(String streamName) {
 
 		Log.d(TAG, "doSubscribe()");
 		if (mPlaybackVideo) {
@@ -186,43 +188,43 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	public void subscribeBound () {
+	public void subscribeBound() {
 
 		Log.d(TAG, "doSubscribeBound()");
 		doSubscribe(mConfiguration.getStreamName());
 
 	}
 
-	public R5StreamSubscriber subscribe (R5Configuration configuration,
-										 boolean enableBackground) {
+	public R5StreamSubscriber subscribe(R5Configuration configuration,
+										boolean enableBackground) {
 
 		return subscribe(configuration, true, enableBackground,
 				mAudioMode, mLogLevel, mScaleMode, false);
 
 	}
 
-	public R5StreamSubscriber subscribe (R5Configuration configuration,
-										 boolean playbackVideo,
-										 boolean enableBackground) {
+	public R5StreamSubscriber subscribe(R5Configuration configuration,
+										boolean playbackVideo,
+										boolean enableBackground) {
 
 		return subscribe(configuration, playbackVideo, enableBackground,
 				mAudioMode, mLogLevel, mScaleMode, false);
 
 	}
 
-	public R5StreamSubscriber subscribe (R5Configuration configuration,
-										 boolean playbackVideo,
-										 boolean enableBackground,
-										 int audioMode,
-										 int logLevel,
-										 int scaleMode) {
+	public R5StreamSubscriber subscribe(R5Configuration configuration,
+										boolean playbackVideo,
+										boolean enableBackground,
+										int audioMode,
+										int logLevel,
+										int scaleMode) {
 
 		return subscribe(configuration, playbackVideo, enableBackground,
 				audioMode, logLevel, scaleMode, false);
 
 	}
 
-	public R5StreamSubscriber subscribe (R5Configuration configuration, R5StreamProps props) {
+	public R5StreamSubscriber subscribe(R5Configuration configuration, R5StreamProps props) {
 
 		Log.d(TAG, props.toString());
 		return subscribe(configuration,
@@ -236,13 +238,13 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	}
 
 
-	public R5StreamSubscriber subscribe (R5Configuration configuration,
-										 boolean playbackVideo,
-										 boolean enableBackground,
-										 int audioMode,
-										 int logLevel,
-										 int scaleMode,
-										 boolean showDebugView) {
+	public R5StreamSubscriber subscribe(R5Configuration configuration,
+										boolean playbackVideo,
+										boolean enableBackground,
+										int audioMode,
+										int logLevel,
+										int scaleMode,
+										boolean showDebugView) {
 
 		mLogLevel = logLevel;
 		mAudioMode = audioMode;
@@ -258,7 +260,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 			// Set up service and offload setup.
 			mEnableBackgroundStreaming = true;
 			mSubscribeIntent = new Intent(mContext.getCurrentActivity(), SubscribeService.class);
-			detectToStartService(mSubscribeIntent, mSubscribeServiceConnection,configuration.getStreamName());
+			detectToStartService(mSubscribeIntent, mSubscribeServiceConnection, configuration.getStreamName());
 			return this;
 		}
 
@@ -267,7 +269,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	public void unsubscribe () {
+	public void unsubscribe() {
 
 		if (mStream != null && mIsStreaming) {
 			Activity activity = mContext.getCurrentActivity();
@@ -276,9 +278,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 				activity.stopService(mSubscribeIntent);
 			}
 			mStream.stop();
-		}
-
-		else {
+		} else {
 			WritableMap map = Arguments.createMap();
 			this.emitEvent(R5VideoViewLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), map);
 			Log.d(TAG, "UNSUBSCRIBE");
@@ -287,7 +287,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	public void setPlaybackVolume (float value) {
+	public void setPlaybackVolume(float value) {
 		Log.d(TAG, "setPlaybackVolume(" + value + ")");
 		if (mIsStreaming) {
 			if (mStream != null && mStream.audioController != null) {
@@ -296,7 +296,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		}
 	}
 
-	public void setVideoView (R5VideoView view) {
+	public void setVideoView(R5VideoView view) {
 		Log.d(TAG, "setVideoView(" + mShowDebugView + ")");
 		if (mStream != null) {
 			view.attachStream(mStream);
@@ -307,7 +307,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		}
 	}
 
-	public void removeVideoView (R5VideoView view) {
+	public void removeVideoView(R5VideoView view) {
 		Log.d(TAG, "removeVideoView()");
 		if (mStream != null) {
 			view.showDebugView(false);
@@ -318,16 +318,19 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		}
 	}
 
-	public void createSharedObject (String streamName) {
-		mSharedObject = new R5SharedObject(streamName,this.mConnection);
+	public void createSharedObject(String streamName) {
+		mSharedObject = new R5SharedObject(streamName, this.mConnection);
 		mSharedObject.client = this;
 	}
 
-	public void closeSharedObject () {
-		mSharedObject.close();
+	public void closeSharedObject() {
+		if (mSharedObject != null)
+			mSharedObject.close();
 	}
 
-	public WritableMap jsonToMap (JSONObject objectValue){
+
+
+	public WritableMap jsonToMap(JSONObject objectValue) {
 		JSONUtil bjc = new JSONUtil();
 		WritableMap map = null;
 		try {
@@ -338,50 +341,71 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		return map;
 	}
 
-	private void sendSharedObjectEvent(String type,WritableMap map){
+	@Override
+	public void sendSharedObjectEvent(String eventName, ReadableMap streamProps) {
+		if(mSharedObject !=null){
+			try {
+				mSharedObject.send(eventName, JSONUtil.convertMapToJson(streamProps));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-		map.putString("type",type);
+	private void onReceiveSharedObjectEvent(String type, WritableMap map) {
+		map.putString("type", type);
 		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
 	}
 
-	public void notReceiveStory(JSONObject objectValue){
-		sendSharedObjectEvent("notReceiveStory",jsonToMap(objectValue));
-	}
-	public void followerCountUp(JSONObject objectValue) {
-		sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
-	}
-	public void followerCountDown(JSONObject objectValue) {
-		sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
-	}
-	public void modifyBroadcast(JSONObject objectValue) {
-		sendSharedObjectEvent("modifyBroadcast",jsonToMap(objectValue));
-	}
-	public void endBroadcast(JSONObject objectValue) {
-		sendSharedObjectEvent("endBroadcast",jsonToMap(objectValue));
-	}
-	public void receiveStory(JSONObject objectValue) {
-		sendSharedObjectEvent("receiveStory",jsonToMap(objectValue));
-	}
-	public void unMute(JSONObject objectValue) {
-		sendSharedObjectEvent("unMute",jsonToMap(objectValue));
-	}
-	public void mute(JSONObject objectValue) {
-		sendSharedObjectEvent("mute",jsonToMap(objectValue));
-	}
-	public void subScribersUpdate(JSONObject objectValue) {
-		sendSharedObjectEvent("subScribersUpdate",jsonToMap(objectValue));
-	}
-	public void hideBroadStory(JSONObject objectValue) {
-		sendSharedObjectEvent("hideBroadStory",jsonToMap(objectValue));
-	}
-	public void showBroadStory(JSONObject objectValue) {
-		sendSharedObjectEvent("showBroadStory",jsonToMap(objectValue));
-	}
-	public void showBroadWorry(JSONObject objectValue) {
-		sendSharedObjectEvent("showBroadWorry",jsonToMap(objectValue));
+	public void notReceiveStory(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("notReceiveStory", jsonToMap(objectValue));
 	}
 
-	protected void setSubscriberDisplayOn (Boolean setOn) {
+	public void followerCountUp(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("followerCountUp", jsonToMap(objectValue));
+	}
+
+	public void followerCountDown(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("followerCountDown", jsonToMap(objectValue));
+	}
+
+	public void modifyBroadcast(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("modifyBroadcast", jsonToMap(objectValue));
+	}
+
+	public void endBroadcast(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("endBroadcast", jsonToMap(objectValue));
+	}
+
+	public void receiveStory(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("receiveStory", jsonToMap(objectValue));
+	}
+
+	public void unMute(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("unMute", jsonToMap(objectValue));
+	}
+
+	public void mute(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("mute", jsonToMap(objectValue));
+	}
+
+	public void subScribersUpdate(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("subScribersUpdate", jsonToMap(objectValue));
+	}
+
+	public void hideBroadStory(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("hideBroadStory", jsonToMap(objectValue));
+	}
+
+	public void showBroadStory(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("showBroadStory", jsonToMap(objectValue));
+	}
+
+	public void showBroadWorry(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("showBroadWorry", jsonToMap(objectValue));
+	}
+
+	protected void setSubscriberDisplayOn(Boolean setOn) {
 
 		Log.d(TAG, "setSubscriberDisplayOn(" + setOn + ")");
 		if (!setOn) {
@@ -401,7 +425,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void sendToBackground () {
+	protected void sendToBackground() {
 
 		Log.d(TAG, "sendToBackground()");
 		if (!mEnableBackgroundStreaming) {
@@ -417,7 +441,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void bringToForeground () {
+	protected void bringToForeground() {
 
 		Log.d(TAG, "bringToForeground()");
 		if (mIsStreaming && mEnableBackgroundStreaming) {
@@ -427,7 +451,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	}
 
-	protected void emitEvent (String type, WritableMap map) {
+	protected void emitEvent(String type, WritableMap map) {
 		if (mEventEmitter != null) {
 			mEventEmitter.receiveEvent(this.getEmitterId(), type, map);
 		} else {
@@ -460,8 +484,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 		if (event == R5ConnectionEvent.START_STREAMING) {
 			mIsStreaming = true;
-		}
-		else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
+		} else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
 			WritableMap evt = new WritableNativeMap();
 			this.emitEvent(R5StreamSubscriber.Events.UNSUBSCRIBE_NOTIFICATION.toString(), evt);
 			Log.d(TAG, "DISCONNECT");
@@ -493,11 +516,11 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		this.mAudioMode = value;
 	}
 
-	public int getEmitterId () {
+	public int getEmitterId() {
 		return this.mEmitterId;
 	}
 
-	public void setEmitterId (int id) {
+	public void setEmitterId(int id) {
 		this.mEmitterId = id;
 		if (mEmitterId > -1 && mEventEmitter == null) {
 			mEventEmitter = mContext.getJSModule(RCTEventEmitter.class);

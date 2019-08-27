@@ -14,6 +14,7 @@ import android.view.Surface;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -473,6 +474,8 @@ public class R5StreamPublisher implements R5StreamInstance,
 		mSharedObject.close();
 	}
 
+
+
 	public void updateLogLevel(int level) {
 		this.mLogLevel = level;
 		if (mStream != null) {
@@ -650,24 +653,40 @@ public class R5StreamPublisher implements R5StreamInstance,
 		return map;
 	}
 
-	private void sendSharedObjectEvent(String type,WritableMap map){
-
+	private void onReceiveSharedObjectEvent(String type,WritableMap map){
 		map.putString("type",type);
 		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
 	}
 
-	public void followerCountUp(JSONObject objectValue) {
-		sendSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+	@Override
+	public void sendSharedObjectEvent(String eventName, ReadableMap streamProps) {
+		if(mSharedObject !=null){
+			try {
+				mSharedObject.send(eventName, JSONUtil.convertMapToJson(streamProps));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
 	}
+
+	public void followerCountUp(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+	}
+
 	public void followerCountDown(JSONObject objectValue) {
-		sendSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
 	}
 
 	public void addBroadStory(JSONObject objectValue) {
-		sendSharedObjectEvent("addBroadStory",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("addBroadStory",jsonToMap(objectValue));
 	}
+
+	public void modifyBroadcast(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("modifyBroadcast", jsonToMap(objectValue));
+	}
+
 	public void onSharedObjectConnect(JSONObject objectValue) {
-		sendSharedObjectEvent("onSharedObjectConnect",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("onSharedObjectConnect",jsonToMap(objectValue));
 	}
 
 	protected void setPublisherDisplayOn (Boolean setOn, Boolean useService) {

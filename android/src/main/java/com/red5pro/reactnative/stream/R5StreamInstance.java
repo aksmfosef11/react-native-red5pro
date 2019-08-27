@@ -14,4 +14,5 @@ public interface R5StreamInstance extends R5ConnectionListener, LifecycleEventLi
 	void updateScaleMode(int mode);
 	void createSharedObject(String streamName);
 	void closeSharedObject();
+	void sendSharedObjectEvent(String eventName, ReadableMap streamProps);
 }

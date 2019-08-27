@@ -17,6 +17,8 @@ import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.R5StreamProtocol;
 import com.red5pro.streaming.config.R5Configuration;
 
+import org.json.JSONObject;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -245,6 +247,19 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 			R5StreamInstance instance = item.getInstance();
 			if (instance != null) {
 				instance.createSharedObject(streamName);
+				return;
+			}
+		}
+	}
+
+	@ReactMethod
+	public void sendSharedObjectEvent (String streamId, String eventName, ReadableMap streamProps) {
+		if (streamMap.containsKey(streamId)) {
+			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
+			R5StreamItem item = streamMap.get(streamId);
+			R5StreamInstance instance = item.getInstance();
+			if (instance != null) {
+				instance.sendSharedObjectEvent(eventName,streamProps);
 				return;
 			}
 		}
