@@ -96,7 +96,7 @@
     _audioBitrate = 32;
     _cameraWidth = 640;
     _cameraHeight = 360;
-    _audioSampleRate = 16000;
+    _audioSampleRate = 22050;
     _useBackfacingCamera = NO;
     _enableBackgroundStreaming = NO;
     _useAdaptiveBitrateController = NO;
@@ -189,8 +189,10 @@
 - (R5Microphone *)setUpMicrophone {
     AVCaptureDevice *audio = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
     R5Microphone *microphone = [[R5Microphone alloc] initWithDevice:audio];
-    microphone.bitrate = _audioBitrate;
-    microphone.sampleRate = _audioSampleRate;
+    microphone.bitrate = 32;
+    microphone.sampleRate = 22050;
+    microphone.channels = 3;
+    microphone.audioController = [[R5AudioController alloc] initWithMode:R5AudioControllerModeStandardIO];
     return microphone;
 }
 
@@ -201,6 +203,7 @@
     } else if (type == 2) {
         recordType = R5RecordTypeAppend;
     }
+    
     
     _recordType = recordType;
     

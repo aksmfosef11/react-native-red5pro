@@ -64,6 +64,7 @@ RCT_REMAP_METHOD(init,
     configuration.buffer_time = [[config objectForKey:@"bufferTime"] floatValue];
     configuration.stream_buffer_time = [[config objectForKey:@"streamBufferTime"] floatValue];
     configuration.parameters = [config objectForKey:@"parameters"];
+    configuration.inheritAVSessionOptions = NO;
     
     R5StreamItem *item = [[R5StreamItem alloc] initWithConfiguration:configuration];
     [[R5StreamModule streamMap] setObject:item forKey:streamId];
@@ -78,6 +79,7 @@ RCT_REMAP_METHOD(subscribe,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:subscribe() %@", streamId);
+    
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamSubscriber *streamInstance = [[R5StreamSubscriber alloc] initWithDeviceEmitter:self];
@@ -103,6 +105,7 @@ RCT_REMAP_METHOD(unsubscribe,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:unsubscribe() %@", streamId);
+    
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
@@ -136,6 +139,7 @@ RCT_REMAP_METHOD(publish,
         if (streamInstance != nil) {
             [item setStreamInstance:(NSObject<R5StreamInstance> *)streamInstance];
             R5Configuration *config = [item getConfiguration];
+            config.inheritAVSessionOptions = NO;
             [(R5StreamPublisher *)streamInstance publish:config withType:type andProps:streamProps];
             resolve(streamId);
             return;
