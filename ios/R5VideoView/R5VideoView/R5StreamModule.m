@@ -110,6 +110,7 @@ RCT_REMAP_METHOD(unsubscribe,
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
+            [(R5StreamSubscriber *)streamInstance closeSharedObject];
             [(R5StreamSubscriber *)streamInstance unsubscribe];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
             [item clear];
@@ -163,6 +164,7 @@ RCT_REMAP_METHOD(unpublish,
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
+            [(R5StreamPublisher *)streamInstance closeSharedObject];
             [(R5StreamPublisher *)streamInstance unpublish];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
             resolve(streamId);
@@ -327,17 +329,6 @@ RCT_EXPORT_METHOD(setSharedObject:(nonnull NSString *)streamId streamName:(nonnu
     }
 }
 
-RCT_EXPORT_METHOD(closeSharedObject:(nonnull NSString *)streamId) {
-    RCTLogInfo(@"R5StreamModule:setSharedObject() %@", streamId);
-    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
-    if (item != nil) {
-        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
-        if (streamInstance != nil) {
-            [streamInstance closeSharedObject];
-        }
-    }
-}
-
 RCT_EXPORT_METHOD(sendSharedObjectEvent:(nonnull NSString *)streamId eventName:(nonnull NSString *)eventName param:(nonnull NSDictionary *)param) {
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
@@ -353,6 +344,7 @@ RCT_EXPORT_METHOD(setSubscribersCount:(nonnull NSString *)streamId count:(int)co
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
+            RCTLogInfo(@"R5StreamModule:setSubscribersCount() %d", count);
             [(R5StreamPublisher *)streamInstance setSubscribersCount:count];
         }
     }
