@@ -90,9 +90,10 @@ public class R5StreamPublisher implements R5StreamInstance,
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.d(TAG, "connection:onServiceConnected()");
-			mBackgroundPublishService = ((PublishService.PublishServiceBinder)service).getService();
+			mBackgroundPublishService = ((PublishService.PublishServiceBinder) service).getService();
 			mBackgroundPublishService.setServicableDelegate(R5StreamPublisher.this);
 		}
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			Log.d(TAG, "connection:onServiceDisconnected()");
@@ -134,7 +135,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 		this.deviceEventEmitter = mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
 	}
 
-	protected void unpackProps (R5StreamProps props, R5StreamPublisher target) {
+	protected void unpackProps(R5StreamProps props, R5StreamPublisher target) {
 
 		target.mLogLevel = props.logLevel;
 		target.mScaleMode = props.scaleMode;
@@ -193,7 +194,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void detectToStartService (Intent intent, ServiceConnection connection) {
+	protected void detectToStartService(Intent intent, ServiceConnection connection) {
 		Log.d(TAG, "detectStartService()");
 		boolean found = false;
 		Activity activity = mContext.getCurrentActivity();
@@ -204,9 +205,10 @@ public class R5StreamPublisher implements R5StreamInstance,
 					found = true;
 				}
 			}
-		} catch (NullPointerException e){}
+		} catch (NullPointerException e) {
+		}
 
-		if(!found){
+		if (!found) {
 			Log.d(TAG, "detectStartService:start()");
 			mContext.getCurrentActivity().startService(intent);
 			doPublish(mConfiguration.getStreamName(), mStreamType);
@@ -217,9 +219,9 @@ public class R5StreamPublisher implements R5StreamInstance,
 		mIsBackgroundBound = true;
 	}
 
-	public void publish (R5Configuration configuration,
-						 R5Stream.RecordType recordType,
-						 R5StreamProps props) {
+	public void publish(R5Configuration configuration,
+						R5Stream.RecordType recordType,
+						R5StreamProps props) {
 
 		unpackProps(props, this);
 		Log.d(TAG, props.toString());
@@ -233,9 +235,9 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void publish (R5Configuration configuration,
-						 R5Stream.RecordType recordType,
-						 boolean enableBackground) {
+	public void publish(R5Configuration configuration,
+						R5Stream.RecordType recordType,
+						boolean enableBackground) {
 
 		this.publish(configuration,
 				recordType,
@@ -247,20 +249,20 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void publishBound () {
+	public void publishBound() {
 
 		Log.d(TAG, "doPublishBound()");
 		doPublish(mConfiguration.getStreamName(), mStreamType);
 
 	}
 
-	public void publish (R5Configuration configuration,
-						 R5Stream.RecordType recordType,
-						 boolean enableBackground,
-						 int audioMode,
-						 int logLevel,
-						 int scaleMode,
-						 boolean showDebugView) {
+	public void publish(R5Configuration configuration,
+						R5Stream.RecordType recordType,
+						boolean enableBackground,
+						int audioMode,
+						int logLevel,
+						int scaleMode,
+						boolean showDebugView) {
 
 		mStreamType = recordType;
 		mShowDebugView = showDebugView;
@@ -281,7 +283,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void unpublish () {
+	public void unpublish() {
 
 		Log.d(TAG, "unpublish()");
 
@@ -299,7 +301,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 		if (mStream != null && mIsStreaming) {
 			this.setPublisherDisplayOn(false, true);
 			Activity activity = mContext.getCurrentActivity();
-			if (mPubishIntent != null && mIsBackgroundBound) {
+			if (mPubishIntent != null && mIsBackgroundBound && mPublishServiceConnection != null) {
 				activity.unbindService(mPublishServiceConnection);
 				activity.stopService(mPubishIntent);
 			}
@@ -313,7 +315,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void swapCamera () {
+	public void swapCamera() {
 
 		Camera updatedCamera;
 
@@ -332,13 +334,12 @@ public class R5StreamPublisher implements R5StreamInstance,
 		if (!mUseBackfacingCamera) {
 			updatedCamera = openBackFacingCameraGingerbread();
 			rotate = 0;
-		}
-		else {
+		} else {
 			updatedCamera = openFrontFacingCameraGingerbread();
 			rotate = 180;
 		}
 
-		if(updatedCamera != null) {
+		if (updatedCamera != null) {
 			updatedCamera.setDisplayOrientation((mCameraOrientation + rotate) % 360);
 			mCamera.setCamera(updatedCamera);
 			mCamera.setOrientation(mCameraOrientation);
@@ -350,31 +351,33 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void muteAudio () {
+	public void muteAudio() {
 		if (mStream != null) {
 			mStream.restrainAudio(true);
 		}
 	}
-	public void unmuteAudio () {
+
+	public void unmuteAudio() {
 		if (mStream != null) {
 			mStream.restrainAudio(false);
 		}
 	}
 
-	public void muteVideo () {
+	public void muteVideo() {
 		if (mStream != null) {
 			mIsRestrainingVideo = true;
 			mStream.restrainVideo(true);
 		}
 	}
-	public void unmuteVideo () {
+
+	public void unmuteVideo() {
 		if (mStream != null) {
 			mIsRestrainingVideo = false;
 			mStream.restrainVideo(false);
 		}
 	}
 
-	protected void doPublish (String streamName, R5Stream.RecordType streamType) {
+	protected void doPublish(String streamName, R5Stream.RecordType streamType) {
 
 		Log.d(TAG, "doPublish()");
 
@@ -401,7 +404,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void setupPublisher (Boolean withPreview) {
+	protected void setupPublisher(Boolean withPreview) {
 
 		R5Camera camera = null;
 		// Establish Camera if requested.
@@ -465,7 +468,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	@Override
 	public void createSharedObject(String streamName) {
-		mSharedObject = new R5SharedObject(streamName,this.mConnection);
+		mSharedObject = new R5SharedObject(streamName, this.mConnection);
 		mSharedObject.client = this;
 	}
 
@@ -475,7 +478,6 @@ public class R5StreamPublisher implements R5StreamInstance,
 	}
 
 
-
 	public void updateLogLevel(int level) {
 		this.mLogLevel = level;
 		if (mStream != null) {
@@ -483,11 +485,11 @@ public class R5StreamPublisher implements R5StreamInstance,
 		}
 	}
 
-	public int getEmitterId () {
+	public int getEmitterId() {
 		return this.mEmitterId;
 	}
 
-	public void setEmitterId (int id) {
+	public void setEmitterId(int id) {
 		this.mEmitterId = id;
 		if (mEmitterId > -1 && mEventEmitter == null) {
 			mEventEmitter = mContext.getJSModule(RCTEventEmitter.class);
@@ -518,10 +520,18 @@ public class R5StreamPublisher implements R5StreamInstance,
 		int rotation = mContext.getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
 
 		switch (rotation) {
-			case Surface.ROTATION_0: degrees = 0; break;
-			case Surface.ROTATION_90: degrees = 270; break;
-			case Surface.ROTATION_180: degrees = 180; break;
-			case Surface.ROTATION_270: degrees = 90; break;
+			case Surface.ROTATION_0:
+				degrees = 0;
+				break;
+			case Surface.ROTATION_90:
+				degrees = 270;
+				break;
+			case Surface.ROTATION_180:
+				degrees = 180;
+				break;
+			case Surface.ROTATION_270:
+				degrees = 90;
+				break;
 		}
 
 		mDisplayOrientation = (mOrigCamOrientation + degrees) % 360;
@@ -534,16 +544,24 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void applyDeviceRotation () {
+	protected void applyDeviceRotation() {
 
 		int degrees = 0;
 		int rotation = mContext.getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
 
 		switch (rotation) {
-			case Surface.ROTATION_0: degrees = 0; break;
-			case Surface.ROTATION_90: degrees = 90; break;
-			case Surface.ROTATION_180: degrees = 180; break;
-			case Surface.ROTATION_270: degrees = 270; break;
+			case Surface.ROTATION_0:
+				degrees = 0;
+				break;
+			case Surface.ROTATION_90:
+				degrees = 90;
+				break;
+			case Surface.ROTATION_180:
+				degrees = 180;
+				break;
+			case Surface.ROTATION_270:
+				degrees = 270;
+				break;
 		}
 
 		mCameraOrientation += degrees;
@@ -552,16 +570,24 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void applyInverseDeviceRotation(){
+	protected void applyInverseDeviceRotation() {
 
 		int degrees = 0;
 		int rotation = mContext.getCurrentActivity().getWindowManager().getDefaultDisplay().getRotation();
 
 		switch (rotation) {
-			case Surface.ROTATION_0: degrees = 0; break;
-			case Surface.ROTATION_90: degrees = 270; break;
-			case Surface.ROTATION_180: degrees = 180; break;
-			case Surface.ROTATION_270: degrees = 90; break;
+			case Surface.ROTATION_0:
+				degrees = 0;
+				break;
+			case Surface.ROTATION_90:
+				degrees = 270;
+				break;
+			case Surface.ROTATION_180:
+				degrees = 180;
+				break;
+			case Surface.ROTATION_270:
+				degrees = 90;
+				break;
 		}
 
 		mCameraOrientation += degrees;
@@ -618,7 +644,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void setVideoView (R5VideoView view) {
+	public void setVideoView(R5VideoView view) {
 
 		Log.d(TAG, "setVideoView(" + mShowDebugView + ")");
 		if (mStream != null && mUseVideo) {
@@ -630,7 +656,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public void removeVideoView (R5VideoView view) {
+	public void removeVideoView(R5VideoView view) {
 
 		Log.d(TAG, "removeVideoView()");
 		if (mStream != null) {
@@ -642,7 +668,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	public WritableMap jsonToMap (JSONObject objectValue){
+	public WritableMap jsonToMap(JSONObject objectValue) {
 		JSONUtil bjc = new JSONUtil();
 		WritableMap map = null;
 		try {
@@ -653,43 +679,57 @@ public class R5StreamPublisher implements R5StreamInstance,
 		return map;
 	}
 
-	private void onReceiveSharedObjectEvent(String type,WritableMap map){
-		map.putString("type",type);
+	private void onReceiveSharedObjectEvent(String type, WritableMap map) {
+		map.putString("type", type);
 		deviceEventEmitter.emit("onReceiveSharedObjectEvent", map);
 	}
 
 	@Override
 	public void sendSharedObjectEvent(String eventName, ReadableMap streamProps) {
-		if(mSharedObject !=null){
+		if (mSharedObject != null) {
 			try {
-				mSharedObject.send(eventName, JSONUtil.convertMapToJson(streamProps));
+				JSONObject object = JSONUtil.convertMapToJson(streamProps);
+				object.put("SendTime", System.currentTimeMillis());
+				mSharedObject.send(eventName, object);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
+	public void setSubscribersCount(int count) {
+		if (mSharedObject != null)
+			mSharedObject.setProperty("Count", count);
+	}
+
+
 	public void followerCountUp(JSONObject objectValue) {
-		onReceiveSharedObjectEvent("followerCountUp",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("followerCountUp", jsonToMap(objectValue));
 	}
 
 	public void followerCountDown(JSONObject objectValue) {
-		onReceiveSharedObjectEvent("followerCountDown",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("followerCountDown", jsonToMap(objectValue));
 	}
 
 	public void addBroadStory(JSONObject objectValue) {
-		onReceiveSharedObjectEvent("addBroadStory",jsonToMap(objectValue));
+		onReceiveSharedObjectEvent("addBroadStory", jsonToMap(objectValue));
 	}
 
 	public void modifyBroadcast(JSONObject objectValue) {
 		onReceiveSharedObjectEvent("modifyBroadcast", jsonToMap(objectValue));
 	}
 
-	public void onSharedObjectConnect(JSONObject objectValue) {
-		onReceiveSharedObjectEvent("onSharedObjectConnect",jsonToMap(objectValue));
+	public void addHeart(JSONObject objectValue) {
+		Log.v("oyw", "addHeart:");
+		onReceiveSharedObjectEvent("addHeart", jsonToMap(objectValue));
 	}
 
-	protected void setPublisherDisplayOn (Boolean setOn, Boolean useService) {
+	public void onSharedObjectConnect(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("onSharedObjectConnect", jsonToMap(objectValue));
+	}
+
+
+	protected void setPublisherDisplayOn(Boolean setOn, Boolean useService) {
 
 		Log.d(TAG, "setPublisherDisplayOn(" + setOn + ")");
 		if (!setOn) {
@@ -733,7 +773,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void sendToBackground () {
+	protected void sendToBackground() {
 
 		Log.d(TAG, "sendToBackground(" + mEnableBackgroundStreaming + ")");
 		if (!mEnableBackgroundStreaming) {
@@ -749,7 +789,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void bringToForeground () {
+	protected void bringToForeground() {
 
 		Log.d(TAG, "bringToForeground()");
 		if (mEnableBackgroundStreaming) {
@@ -759,7 +799,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	}
 
-	protected void emitEvent (String type, WritableMap map) {
+	protected void emitEvent(String type, WritableMap map) {
 
 		if (mEventEmitter != null) {
 			Log.d(TAG, "Dispatch using Event emitter.");
@@ -795,8 +835,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 		if (event == R5ConnectionEvent.START_STREAMING) {
 			mIsStreaming = true;
-		}
-		else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
+		} else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
 			WritableMap evt = new WritableNativeMap();
 			this.emitEvent(R5VideoViewLayout.Events.UNPUBLISH_NOTIFICATION.toString(), evt);
 			Log.d(TAG, "DISCONNECT");

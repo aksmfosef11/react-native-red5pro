@@ -12,15 +12,11 @@ import com.red5pro.reactnative.stream.R5StreamProps;
 import com.red5pro.reactnative.stream.R5StreamPublisher;
 import com.red5pro.reactnative.stream.R5StreamSubscriber;
 import com.red5pro.reactnative.util.RecordTypeUtil;
-import com.red5pro.reactnative.view.R5VideoViewLayout;
-import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.R5StreamProtocol;
 import com.red5pro.streaming.config.R5Configuration;
 
-import org.json.JSONObject;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class R5StreamModule extends ReactContextBaseJavaModule {
 
@@ -93,7 +89,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void subscribe (String streamId, ReadableMap streamProps, Promise promise) {
+	public void subscribe(String streamId, ReadableMap streamProps, Promise promise) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "subscribe:id(" + streamId + ")");
 			R5StreamProps props = R5StreamProps.fromMap(streamProps);
@@ -109,22 +105,27 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void unsubscribe (String streamId, Promise promise) {
+	public void unsubscribe(String streamId, Promise promise) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unsubscribe:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
-			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
-			if (instance != null) {
-				instance.unsubscribe();
-				promise.resolve(streamId);
-				return;
+			try {
+				R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
+				if (instance != null) {
+					instance.closeSharedObject();
+					instance.unsubscribe();
+					promise.resolve(streamId);
+					return;
+				}
+			}catch (ClassCastException e){
+				unpublish(streamId,promise);
 			}
 		}
 		promise.reject(E_STREAM_ERROR, "Stream with id(" + streamId + ") not found.");
 	}
 
 	@ReactMethod
-	public void publish (String streamId, int streamType, ReadableMap streamProps, Promise promise) {
+	public void publish(String streamId, int streamType, ReadableMap streamProps, Promise promise) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "publish:id(" + streamId + ")");
 			R5StreamProps props = R5StreamProps.fromMap(streamProps);
@@ -141,28 +142,33 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void unpublish (String streamId, Promise promise) {
+	public void unpublish(String streamId, Promise promise) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unpublish:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
-			R5StreamPublisher instance = ((R5StreamPublisher) item.getInstance());
-			if (instance != null) {
-				instance.unpublish();
-				promise.resolve(streamId);
-				return;
+			try {
+				R5StreamPublisher instance = ((R5StreamPublisher) item.getInstance());
+				if (instance != null) {
+					instance.closeSharedObject();
+					instance.unpublish();
+					promise.resolve(streamId);
+					return;
+				}
+			}catch(ClassCastException e){
+				unsubscribe(streamId,promise);
 			}
 		}
 		promise.reject(E_STREAM_ERROR, "Stream with id(" + streamId + ") not found.");
 	}
 
 	@ReactMethod
-	public void setPlaybackVolume (String streamId, int value) {
+	public void setPlaybackVolume(String streamId, int value) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "setPlaybackVolume:id(" + streamId + ") = " + value);
 			R5StreamItem item = streamMap.get(streamId);
 			R5StreamSubscriber instance = ((R5StreamSubscriber) item.getInstance());
 			if (instance != null) {
-				instance.setPlaybackVolume(value/100);
+				instance.setPlaybackVolume(value / 100);
 				return;
 			}
 		}
@@ -170,7 +176,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void swapCamera (String streamId) {
+	public void swapCamera(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "swapCamera:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
@@ -184,7 +190,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void muteAudio (String streamId) {
+	public void muteAudio(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "muteAudio:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
@@ -198,7 +204,21 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void unmuteAudio (String streamId) {
+	public void setSubscribersCount(String streamId, int count) {
+		if (streamMap.containsKey(streamId)) {
+			Log.d(TAG, "muteAudio:id(" + streamId + ")");
+			R5StreamItem item = streamMap.get(streamId);
+			R5StreamPublisher instance = ((R5StreamPublisher) item.getInstance());
+			if (instance != null) {
+				instance.setSubscribersCount(count);
+				return;
+			}
+		}
+		Log.d(TAG, "Could not mute audio on broadcast. Stream :id(" + streamId + ") not found.");
+	}
+
+	@ReactMethod
+	public void unmuteAudio(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteAudio:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
@@ -212,7 +232,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void muteVideo (String streamId) {
+	public void muteVideo(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "muteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
@@ -226,7 +246,7 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void unmuteVideo (String streamId) {
+	public void unmuteVideo(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
@@ -240,12 +260,12 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void setSharedObject (String streamId,String streamName) {
+	public void setSharedObject(String streamId, String streamName) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
 			R5StreamInstance instance = item.getInstance();
-			if (instance != null) {
+			if (instance != null && streamName != null) {
 				instance.createSharedObject(streamName);
 				return;
 			}
@@ -253,32 +273,21 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 	}
 
 	@ReactMethod
-	public void sendSharedObjectEvent (String streamId, String eventName, ReadableMap streamProps) {
+	public void sendSharedObjectEvent(String streamId, String eventName, ReadableMap streamProps) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
 			R5StreamItem item = streamMap.get(streamId);
 			R5StreamInstance instance = item.getInstance();
 			if (instance != null) {
-				instance.sendSharedObjectEvent(eventName,streamProps);
+				instance.sendSharedObjectEvent(eventName, streamProps);
 				return;
 			}
 		}
 	}
 
-	@ReactMethod
-	public void closeSharedObject (String streamId) {
-		if (streamMap.containsKey(streamId)) {
-			Log.d(TAG, "unmuteVideo:id(" + streamId + ")");
-			R5StreamItem item = streamMap.get(streamId);
-			R5StreamInstance instance = item.getInstance();
-			if (instance != null) {
-				instance.closeSharedObject();
-				return;
-			}
-		}
-	}
 
-	public R5StreamInstance getStreamInstance (String streamId) {
+
+	public R5StreamInstance getStreamInstance(String streamId) {
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "getStreamInstance(" + streamId + ")");
 			return streamMap.get(streamId).getInstance();

@@ -270,7 +270,6 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	}
 
 	public void unsubscribe() {
-
 		if (mStream != null && mIsStreaming) {
 			Activity activity = mContext.getCurrentActivity();
 			if (mSubscribeIntent != null) {
@@ -319,15 +318,16 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	}
 
 	public void createSharedObject(String streamName) {
-		mSharedObject = new R5SharedObject(streamName, this.mConnection);
-		mSharedObject.client = this;
+		if (mConnection != null) {
+			mSharedObject = new R5SharedObject(streamName, this.mConnection);
+			mSharedObject.client = this;
+		}
 	}
 
 	public void closeSharedObject() {
 		if (mSharedObject != null)
 			mSharedObject.close();
 	}
-
 
 
 	public WritableMap jsonToMap(JSONObject objectValue) {
@@ -343,9 +343,11 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	@Override
 	public void sendSharedObjectEvent(String eventName, ReadableMap streamProps) {
-		if(mSharedObject !=null){
+		if (mSharedObject != null) {
 			try {
-				mSharedObject.send(eventName, JSONUtil.convertMapToJson(streamProps));
+				JSONObject object = JSONUtil.convertMapToJson(streamProps);
+				object.put("SendTime", System.currentTimeMillis());
+				mSharedObject.send(eventName, object);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -403,6 +405,10 @@ public class R5StreamSubscriber implements R5StreamInstance,
 
 	public void showBroadWorry(JSONObject objectValue) {
 		onReceiveSharedObjectEvent("showBroadWorry", jsonToMap(objectValue));
+	}
+
+	public void onUpdateProperty(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("subScribersUpdate", jsonToMap(objectValue));
 	}
 
 	protected void setSubscriberDisplayOn(Boolean setOn) {
@@ -545,7 +551,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void onHostDestroy() {
 		Log.d(TAG, "onHostDestroy()");
 		Activity activity = mContext.getCurrentActivity();
-		if (mSubscribeIntent != null && mIsBackgroundBound) {
+		if (mSubscribeIntent != null && mIsBackgroundBound && mSubscribeServiceConnection !=null) {
 			this.setSubscriberDisplayOn(false);
 			activity.unbindService(mSubscribeServiceConnection);
 			activity.stopService(mSubscribeIntent);
