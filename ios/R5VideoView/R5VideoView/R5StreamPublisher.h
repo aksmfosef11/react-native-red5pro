@@ -32,7 +32,7 @@
 - (void)followerCountUp:(NSMutableDictionary*)messageIn;
 - (void)followerCountDown:(NSMutableDictionary*)messageIn;
 - (void)addBroadStory:(NSMutableDictionary*)messageIn;
-
+- (void)setSubscribersCount:(int)count;
 
 
 @end

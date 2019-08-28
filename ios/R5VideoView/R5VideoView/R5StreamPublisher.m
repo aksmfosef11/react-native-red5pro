@@ -252,6 +252,12 @@
     
 }
 
+- (void)setSubscribersCount:(int)count {
+     if (self.sharedObject != nil){
+         [self.sharedObject setProperty:@"Count" withValue:@(count)];
+     }
+}
+
 - (void)swapCamera {
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -360,7 +366,9 @@
 }
 
 - (void)closeSharedObject{
-    [self.sharedObject close];
+     if (self.sharedObject != nil){
+         [self.sharedObject close];
+     }
 }
 
 - (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {

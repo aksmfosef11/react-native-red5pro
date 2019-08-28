@@ -284,6 +284,12 @@
     }
 }
 
+- (void)onUpdateProperty:(NSDictionary*)messageIn{
+    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithDictionary:messageIn];
+    dict[@"type"] = @"subScribersUpdate";
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:dict];
+}
+
 
 
 - (void) setVideoView:(R5VideoViewController *)view {
