@@ -196,92 +196,105 @@
 }
 
 - (void)closeSharedObject{
-    [self.sharedObject close];
+    if (self.sharedObject != nil){
+        [self.sharedObject close];
+    }
 }
 
 
 - (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {
     
     messageIn[@"type"] = @"onSharedObjectConnect";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)notReceiveStory:(NSMutableDictionary *)messageIn {
     
     messageIn[@"type"] = @"notReceiveStory";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)followerCountUp:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"followerCountUp";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)followerCountDown:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"followerCountDown";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)modifyBroadcast:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"modifyBroadcast";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)endBroadcast:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"endBroadcast";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)receiveStory:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"receiveStory";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)unMute:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"unMute";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)mute:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"mute";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)subScribersUpdate:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"subScribersUpdate";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)hideBroadStory:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"hideBroadStory";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)showBroadStory:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"showBroadStory";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)showBroadWorry:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"showBroadWorry";
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:messageIn];
+    [self onReceiveSharedObjectEvent:messageIn];
 }
 
 - (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
     if (self.sharedObject != nil){
         [self.sharedObject send:eventName withParams:param];
     }
+}
+
+- (void)onUpdateProperty:(NSDictionary*)messageIn{
+    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithDictionary:messageIn];
+    dict[@"type"] = @"subScribersUpdate";
+    [self onReceiveSharedObjectEvent:dict];
+}
+
+- (void)onReceiveSharedObjectEvent:(NSMutableDictionary *)param{
+    param[@"SendTime"] = [NSDate date];
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:param];
 }
 
 

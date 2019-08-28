@@ -37,6 +37,9 @@
 - (void)showBroadStory:(NSMutableDictionary*)messageIn;
 - (void)showBroadWorry:(NSMutableDictionary*)messageIn;
 - (void)onSharedObjectConnect:(NSMutableDictionary*)messageIn;
+- (void)onUpdateProperty:(NSDictionary*)messageIn;
+- (void)onReceiveSharedObjectEvent:(NSMutableDictionary *)param;
+
 
 
 @end

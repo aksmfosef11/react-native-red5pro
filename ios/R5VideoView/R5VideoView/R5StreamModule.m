@@ -64,6 +64,7 @@ RCT_REMAP_METHOD(init,
     configuration.buffer_time = [[config objectForKey:@"bufferTime"] floatValue];
     configuration.stream_buffer_time = [[config objectForKey:@"streamBufferTime"] floatValue];
     configuration.parameters = [config objectForKey:@"parameters"];
+    configuration.inheritAVSessionOptions = NO;
     
     R5StreamItem *item = [[R5StreamItem alloc] initWithConfiguration:configuration];
     [[R5StreamModule streamMap] setObject:item forKey:streamId];
@@ -78,6 +79,7 @@ RCT_REMAP_METHOD(subscribe,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:subscribe() %@", streamId);
+    
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamSubscriber *streamInstance = [[R5StreamSubscriber alloc] initWithDeviceEmitter:self];
@@ -103,10 +105,12 @@ RCT_REMAP_METHOD(unsubscribe,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:unsubscribe() %@", streamId);
+    
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
+            [(R5StreamSubscriber *)streamInstance closeSharedObject];
             [(R5StreamSubscriber *)streamInstance unsubscribe];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
             [item clear];
@@ -136,6 +140,7 @@ RCT_REMAP_METHOD(publish,
         if (streamInstance != nil) {
             [item setStreamInstance:(NSObject<R5StreamInstance> *)streamInstance];
             R5Configuration *config = [item getConfiguration];
+            config.inheritAVSessionOptions = NO;
             [(R5StreamPublisher *)streamInstance publish:config withType:type andProps:streamProps];
             resolve(streamId);
             return;
@@ -159,6 +164,7 @@ RCT_REMAP_METHOD(unpublish,
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
+            [(R5StreamPublisher *)streamInstance closeSharedObject];
             [(R5StreamPublisher *)streamInstance unpublish];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
             resolve(streamId);
@@ -323,23 +329,23 @@ RCT_EXPORT_METHOD(setSharedObject:(nonnull NSString *)streamId streamName:(nonnu
     }
 }
 
-RCT_EXPORT_METHOD(closeSharedObject:(nonnull NSString *)streamId) {
-    RCTLogInfo(@"R5StreamModule:setSharedObject() %@", streamId);
-    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
-    if (item != nil) {
-        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
-        if (streamInstance != nil) {
-            [streamInstance closeSharedObject];
-        }
-    }
-}
-
 RCT_EXPORT_METHOD(sendSharedObjectEvent:(nonnull NSString *)streamId eventName:(nonnull NSString *)eventName param:(nonnull NSDictionary *)param) {
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
             [streamInstance sendSharedObjectEvent:eventName param:param];
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(setSubscribersCount:(nonnull NSString *)streamId count:(int)count) {
+    R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
+    if (item != nil) {
+        NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
+        if (streamInstance != nil) {
+            RCTLogInfo(@"R5StreamModule:setSubscribersCount() %d", count);
+            [(R5StreamPublisher *)streamInstance setSubscribersCount:count];
         }
     }
 }
