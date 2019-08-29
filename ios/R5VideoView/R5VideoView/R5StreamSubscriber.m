@@ -10,6 +10,10 @@
 #import <R5Streaming/R5Streaming.h>
 #import "R5StreamSubscriber.h"
 #import <React/RCTLog.h>
+#import <MediaPlayer/MPNowPlayingInfoCenter.h>
+#import <MediaPlayer/MPMediaItem.h>
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 @interface R5StreamSubscriber() {
     
@@ -116,6 +120,16 @@
 }
 
 - (void)subscribe:(R5Configuration *)configuration andProps:(NSDictionary *)props {
+    
+    
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker|
+     AVAudioSessionCategoryOptionAllowAirPlay|
+     AVAudioSessionCategoryOptionAllowBluetooth|
+     AVAudioSessionCategoryOptionAllowBluetoothA2DP error:nil];
+    [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:0.005 error:nil];
+    [[AVAudioSession sharedInstance] setPreferredSampleRate:22050 error:nil];
+    [[AVAudioSession sharedInstance] setPreferredInputNumberOfChannels:3 error:nil];
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
     
     [self unpackProps:props];
     r5_set_log_level(_logLevel);
@@ -300,7 +314,7 @@
 
 
 - (void) setVideoView:(R5VideoViewController *)view {
-    
+
     //    dispatch_async(dispatch_get_main_queue(), ^{
     if (self.stream != nil && _playbackVideo) {
         [view showDebugInfo:_showDebugInfo];
@@ -349,12 +363,12 @@
 
 # pragma R5StreamDelegate
 -(void)onR5StreamStatus:(R5Stream *)stream withStatus:(int) statusCode withMessage:(NSString*)msg {
-    
+
     NSString *tmpStreamName = _streamName;
     
     if (statusCode == r5_status_start_streaming) {
         _isStreaming = YES;
-        
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{

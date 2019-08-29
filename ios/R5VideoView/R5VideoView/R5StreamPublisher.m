@@ -9,6 +9,7 @@
 #import <React/RCTEventEmitter.h>
 #import <R5Streaming/R5Streaming.h>
 #import "R5StreamPublisher.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface R5StreamPublisher() {
     
@@ -197,6 +198,13 @@
 }
 
 - (void)publish:(R5Configuration *)configuration withType:(int)type andProps:(NSDictionary *)props {
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker|
+     AVAudioSessionCategoryOptionAllowAirPlay|
+     AVAudioSessionCategoryOptionAllowBluetooth|
+     AVAudioSessionCategoryOptionAllowBluetoothA2DP|
+     AVAudioSessionCategoryOptionMixWithOthers error:nil];
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    
     int recordType = R5RecordTypeLive;
     if (type == 1) {
         recordType = R5RecordTypeRecord;
