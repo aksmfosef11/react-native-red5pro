@@ -33,6 +33,7 @@
 - (void)followerCountDown:(NSMutableDictionary*)messageIn;
 - (void)addBroadStory:(NSMutableDictionary*)messageIn;
 - (void)setSubscribersCount:(int)count;
+- (void)onReceiveSharedObjectEvent:(NSMutableDictionary*)param;
 
 
 @end

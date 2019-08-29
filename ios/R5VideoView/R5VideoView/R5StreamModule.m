@@ -13,6 +13,7 @@
 #import <R5Streaming/R5Streaming.h>
 #import <React/RCTLog.h>
 
+
 static NSMutableDictionary *_streamMap;
 
 @implementation R5StreamModule
@@ -79,7 +80,9 @@ RCT_REMAP_METHOD(subscribe,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:subscribe() %@", streamId);
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    });
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamSubscriber *streamInstance = [[R5StreamSubscriber alloc] initWithDeviceEmitter:self];
@@ -134,6 +137,9 @@ RCT_REMAP_METHOD(publish,
                  rejecter:(RCTPromiseRejectBlock)reject) {
     
     RCTLogInfo(@"R5StreamModule:publish() %@", streamId);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
+    });
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamPublisher *streamInstance = [[R5StreamPublisher alloc] initWithDeviceEmitter:self];
