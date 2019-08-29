@@ -284,7 +284,6 @@ public class R5StreamPublisher implements R5StreamInstance,
 	}
 
 	public void unpublish() {
-
 		Log.d(TAG, "unpublish()");
 
 		if (mCamera != null) {
@@ -474,7 +473,8 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	@Override
 	public void closeSharedObject() {
-		mSharedObject.close();
+		if (mSharedObject != null)
+			mSharedObject.close();
 	}
 
 
