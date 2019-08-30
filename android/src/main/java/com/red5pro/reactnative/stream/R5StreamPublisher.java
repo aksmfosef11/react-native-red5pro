@@ -284,6 +284,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 	}
 
 	public void unpublish() {
+
 		Log.d(TAG, "unpublish()");
 
 		if (mCamera != null) {
@@ -473,8 +474,7 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	@Override
 	public void closeSharedObject() {
-		if (mSharedObject != null)
-			mSharedObject.close();
+		mSharedObject.close();
 	}
 
 
@@ -861,12 +861,16 @@ public class R5StreamPublisher implements R5StreamInstance,
 	public void onHostDestroy() {
 		Log.d(TAG, "onHostDestroy()");
 		Activity activity = mContext.getCurrentActivity();
-		if (mPubishIntent != null && mIsBackgroundBound) {
-			this.setPublisherDisplayOn(false, true);
+		this.setPublisherDisplayOn(false, true);
+		if (mPublishServiceConnection != null)
 			activity.unbindService(mPublishServiceConnection);
+		if (mPubishIntent != null) {
 			activity.stopService(mPubishIntent);
-			mIsBackgroundBound = false;
 		}
+		if (mStream != null)
+			mStream.stop();
+		cleanup();
+		mIsBackgroundBound = false;
 	}
 
 }

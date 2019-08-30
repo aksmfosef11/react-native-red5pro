@@ -275,8 +275,6 @@ public class R5StreamSubscriber implements R5StreamInstance,
 			if (mSubscribeIntent != null) {
 				activity.unbindService(mSubscribeServiceConnection);
 				activity.stopService(mSubscribeIntent);
-				mSubscribeServiceConnection = null;
-				mSubscribeIntent = null;
 			}
 			mStream.stop();
 		} else {
@@ -553,15 +551,18 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void onHostDestroy() {
 		Log.d(TAG, "onHostDestroy()");
 		Activity activity = mContext.getCurrentActivity();
-		if (mSubscribeIntent != null && mIsBackgroundBound && mSubscribeServiceConnection != null) {
-			this.setSubscriberDisplayOn(false);
+		this.setSubscriberDisplayOn(false);
+		if(mSubscribeServiceConnection !=null){
 			activity.unbindService(mSubscribeServiceConnection);
-			activity.stopService(mSubscribeIntent);
-			mSubscribeServiceConnection = null;
-			mSubscribeIntent = null;
-			mIsBackgroundBound = false;
 		}
+		if (mSubscribeIntent != null ) {
+			activity.stopService(mSubscribeIntent);
+		}
+		if(mStream != null) {
+			mStream.stop();
+		}
+		mIsBackgroundBound = false;
+		cleanup();
 	}
-
 
 }
