@@ -547,13 +547,31 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		sendToBackground();
 	}
 
+	public boolean isToStartService(String className) {
+		ActivityManager actManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+		boolean found = false;
+		try {
+			for (ActivityManager.RunningServiceInfo serviceInfo : actManager.getRunningServices(Integer.MAX_VALUE)) {
+				if (serviceInfo.service.getClassName().equals(className)) {
+					found = true;
+				}
+			}
+		} catch (NullPointerException e) {
+			found = false;
+		}
+		return found;
+	}
+
 	@Override
 	public void onHostDestroy() {
 		Log.d(TAG, "onHostDestroy()");
 		Activity activity = mContext.getCurrentActivity();
 		this.setSubscriberDisplayOn(false);
 		if(mSubscribeServiceConnection !=null){
-			activity.unbindService(mSubscribeServiceConnection);
+			boolean found = isToStartService(SubscribeService.class.getName());
+			if(found){
+				activity.unbindService(mSubscribeServiceConnection);
+			}
 		}
 		if (mSubscribeIntent != null ) {
 			activity.stopService(mSubscribeIntent);
