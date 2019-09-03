@@ -23,6 +23,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.red5pro.reactnative.util.JSONUtil;
 import com.red5pro.reactnative.view.PublishService;
 import com.red5pro.reactnative.view.R5VideoViewLayout;
+import com.red5pro.reactnative.view.SubscribeService;
 import com.red5pro.streaming.R5Connection;
 import com.red5pro.streaming.R5SharedObject;
 import com.red5pro.streaming.R5Stream;
@@ -474,7 +475,8 @@ public class R5StreamPublisher implements R5StreamInstance,
 
 	@Override
 	public void closeSharedObject() {
-		mSharedObject.close();
+		if (mSharedObject != null)
+			mSharedObject.close();
 	}
 
 

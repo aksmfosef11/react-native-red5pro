@@ -77,6 +77,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		}
 	};
 
+
 	public enum Events {
 
 		CONFIGURED("onConfigured"),
@@ -550,6 +551,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public boolean isToStartService(String className) {
 		ActivityManager actManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
 		boolean found = false;
+		Log.v("oyw", "className:" + className);
 		try {
 			for (ActivityManager.RunningServiceInfo serviceInfo : actManager.getRunningServices(Integer.MAX_VALUE)) {
 				if (serviceInfo.service.getClassName().equals(className)) {
@@ -567,16 +569,13 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		Log.d(TAG, "onHostDestroy()");
 		Activity activity = mContext.getCurrentActivity();
 		this.setSubscriberDisplayOn(false);
-		if(mSubscribeServiceConnection !=null){
-			boolean found = isToStartService(SubscribeService.class.getName());
-			if(found){
-				activity.unbindService(mSubscribeServiceConnection);
-			}
+		if (mBackgroundSubscribeService != null) {
+			activity.unbindService(mSubscribeServiceConnection);
 		}
-		if (mSubscribeIntent != null ) {
+		if (mSubscribeIntent != null) {
 			activity.stopService(mSubscribeIntent);
 		}
-		if(mStream != null) {
+		if (mStream != null) {
 			mStream.stop();
 		}
 		mIsBackgroundBound = false;

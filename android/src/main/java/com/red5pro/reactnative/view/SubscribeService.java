@@ -5,7 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 public class SubscribeService  extends Service {
@@ -14,7 +14,9 @@ public class SubscribeService  extends Service {
 
 	private Notification holderNote;
 	private final SubscribeService.SubscribeServiceBinder mBinder = new SubscribeService.SubscribeServiceBinder();
-
+	public final static String CLOSE = "CLOSE";
+	public final static String PAUSE = "PAUSE";
+	public final static String PLAY = "PLAY";
 
 	@Nullable
 	@Override
@@ -41,6 +43,21 @@ public class SubscribeService  extends Service {
 			startSubscribe();
 
 		}
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent != null) {
+			String action = intent.getAction();
+			if (CLOSE.equals(action)) {
+				//CLOSE 액션
+			}else if(PAUSE.equals(action)){
+
+			}else if(PLAY.equals(action)){
+
+			}
+		}
+		return super.onStartCommand(intent, flags, startId);
 	}
 
 	private void startSubscribe() {
