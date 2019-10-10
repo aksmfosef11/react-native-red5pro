@@ -403,14 +403,17 @@
     [self onReceiveSharedObjectEvent:messageIn];
 }
 
-- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
+- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSMutableDictionary *)param{
     if (self.sharedObject != nil){
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy:MM:dd:HH:ss.SSS zzz"];
+        NSString *string = [dateFormatter stringFromDate:[NSDate date]];
+        param[@"SendTime"] = string;
         [self.sharedObject send:eventName withParams:param];
     }
 }
 
 - (void)onReceiveSharedObjectEvent:(NSMutableDictionary *)param{
-    param[@"SendTime"] = [NSDate date];
     [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:param];
 }
 

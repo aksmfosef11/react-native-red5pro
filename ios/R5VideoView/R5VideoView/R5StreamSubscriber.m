@@ -1,38 +1,46 @@
 //
-//  R5StreamSubscriber.m
+//  R5StreamPublisher.m
 //  R5VideoView
 //
-//  Created by Todd Anderson on 04/12/2018.
+//  Created by Todd Anderson on 03/12/2018.
 //  Copyright © 2018 Red5Pro. All rights reserved.
 //
 
 #import <React/RCTEventEmitter.h>
 #import <R5Streaming/R5Streaming.h>
-#import "R5StreamSubscriber.h"
-#import <React/RCTLog.h>
-#import <MediaPlayer/MPNowPlayingInfoCenter.h>
-#import <MediaPlayer/MPMediaItem.h>
+#import "R5StreamPublisher.h"
 #import <AVFoundation/AVFoundation.h>
-#import <MediaPlayer/MediaPlayer.h>
 
-@interface R5StreamSubscriber() {
+@interface R5StreamPublisher() {
     
     BOOL _isStreaming;
+    BOOL _hasExplicitlyPausedVideo;
     
     RCTEventEmitter *_emitter;
+    int _recordType;
+    NSString *_streamName;  // required.
     
     int _logLevel;
     int _scaleMode;
     int _audioMode;
     BOOL _showDebugInfo;
-    BOOL _playbackVideo;
+    
+    BOOL _useVideo;
+    BOOL _useAudio;
+    int _cameraWidth;
+    int _cameraHeight;
+    int _bitrate;
+    int _framerate;
+    int _audioBitrate;
+    int _audioSampleRate;
+    BOOL _useAdaptiveBitrateController;
+    BOOL _useBackfacingCamera;
     BOOL _enableBackgroundStreaming;
-    NSString *_streamName;  // required.
     
 }
 @end
 
-@implementation R5StreamSubscriber
+@implementation R5StreamPublisher
 {
     bool hasListeners;
 }
@@ -44,6 +52,15 @@
         [self addObservers];
     }
     return self;
+}
+
+- (id)init {
+    
+    if ([super init] != nil) {
+        [self addObservers];
+    }
+    return self;
+    
 }
 
 -(void)startObserving {
@@ -58,12 +75,14 @@
     [self startObserving];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterForegroundActive:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDeviceOrientation:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)removeObservers {
     [self stopObserving];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)unpackProps:(NSDictionary *)props {
@@ -71,8 +90,18 @@
     _scaleMode = 0;
     _logLevel = 3;
     _showDebugInfo = NO;
-    _playbackVideo = YES;
+    _useVideo = YES;
+    _useAudio = YES;
+    _bitrate = 750;
+    _framerate = 15;
+    _audioBitrate = 32;
+    _cameraWidth = 640;
+    _cameraHeight = 360;
+    _audioSampleRate = 22050;
+    _useBackfacingCamera = NO;
     _enableBackgroundStreaming = NO;
+    _useAdaptiveBitrateController = NO;
+    _audioMode = R5AudioControllerModeStandardIO;
     
     if (props == nil) {
         return;
@@ -82,25 +111,33 @@
     _scaleMode = [props objectForKey:@"scaleMode"] != nil ? [[props objectForKey:@"scaleMode"] intValue] : _scaleMode;
     _audioMode = [props objectForKey:@"audioMode"] != nil ? [[props objectForKey:@"audioMode"] intValue] : _audioMode;
     _showDebugInfo = [props objectForKey:@"showDebugView"] != nil ? [[props objectForKey:@"showDebugView"] boolValue] : _showDebugInfo;
-    _playbackVideo = [props objectForKey:@"subscribeVideo"] != nil ? [[props objectForKey:@"subscribeVideo"] boolValue] : _playbackVideo;
+    _useVideo = [props objectForKey:@"publishVideo"] != nil ? [[props objectForKey:@"publishVideo"] boolValue] : _useVideo;
+    _useAudio = [props objectForKey:@"publishAudio"] != nil ? [[props objectForKey:@"publishAudio"] boolValue] : _useAudio;
+    _cameraWidth = [props objectForKey:@"cameraWidth"] != nil ? [[props objectForKey:@"cameraWidth"] intValue] : _cameraWidth;
+    _cameraHeight = [props objectForKey:@"cameraHeight"] != nil ? [[props objectForKey:@"cameraHeight"] intValue] : _cameraHeight;
+    _bitrate = [props objectForKey:@"bitrate"] != nil ? [[props objectForKey:@"bitrate"] intValue] : _bitrate;
+    _framerate = [props objectForKey:@"framerate"] != nil ? [[props objectForKey:@"framerate"] intValue] : _framerate;
+    _audioBitrate = [props objectForKey:@"audioBitrate"] != nil ? [[props objectForKey:@"audioBitrate"] intValue] : _audioBitrate;
+    _audioSampleRate = [props objectForKey:@"audioSampleRate"] != nil ? [[props objectForKey:@"audioSampleRate"] intValue] : _audioSampleRate;
+    _useBackfacingCamera = [props objectForKey:@"useBackfacingCamera"] != nil ? [[props objectForKey:@"useBackfacingCamera"] boolValue] : _useBackfacingCamera;
     _enableBackgroundStreaming = [props objectForKey:@"enableBackgroundStreaming"] != nil ? [[props objectForKey:@"enableBackgroundStreaming"] boolValue] : _enableBackgroundStreaming;
-    
+    _useAdaptiveBitrateController = [props objectForKey:@"useAdaptiveBitrateController"] != nil ? [[props objectForKey:@"useAdaptiveBitrateController"] boolValue] : _useAdaptiveBitrateController;
 }
 
 - (void)tearDown {
     
-    RCTLogInfo(@"R5StreamSubscriber:teardown()");
     if (self.stream != nil) {
         [self.stream setDelegate:nil];
         [self.stream setClient:nil];
     }
-    
     _streamName = nil;
     _isStreaming = NO;
     self.stream = nil;
-    self.connection = nil;
-    self.configuration = nil;
+    
+    _hasExplicitlyPausedVideo = NO;
     [self removeObservers];
+    [self setEmitter:nil];
+    self.viewEmitter = nil;
     
 }
 
@@ -119,17 +156,64 @@
     
 }
 
-- (void)subscribe:(R5Configuration *)configuration andProps:(NSDictionary *)props {
+- (AVCaptureDevice *)getCameraDevice:(BOOL)backfacing {
     
+    NSArray *list = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    AVCaptureDevice *frontCamera;
+    AVCaptureDevice *backCamera;
+    for (AVCaptureDevice *device in list) {
+        if (device.position == AVCaptureDevicePositionFront) {
+            frontCamera = device;
+        }
+        else if (device.position == AVCaptureDevicePositionBack) {
+            backCamera = device;
+        }
+    }
     
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker|
+    if (backfacing && backCamera != NULL) {
+        return backCamera;
+    }
+    return frontCamera;
+    
+}
+
+- (R5Camera *)setUpCamera {
+    AVCaptureDevice *video = [self getCameraDevice:_useBackfacingCamera];
+    R5Camera *camera = [[R5Camera alloc] initWithDevice:video andBitRate:_bitrate];
+    [camera setWidth:_cameraWidth];
+    [camera setHeight:_cameraHeight];
+    [camera setOrientation:90];
+    [camera setFps:_framerate];
+    return camera;
+}
+
+- (R5Microphone *)setUpMicrophone {
+    AVCaptureDevice *audio = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
+    R5Microphone *microphone = [[R5Microphone alloc] initWithDevice:audio];
+    microphone.bitrate = 32;
+    microphone.sampleRate = 22050;
+    microphone.channels = 3;
+    microphone.audioController = [[R5AudioController alloc] initWithMode:R5AudioControllerModeStandardIO];
+    return microphone;
+}
+
+- (void)publish:(R5Configuration *)configuration withType:(int)type andProps:(NSDictionary *)props {
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker|
      AVAudioSessionCategoryOptionAllowAirPlay|
      AVAudioSessionCategoryOptionAllowBluetooth|
-     AVAudioSessionCategoryOptionAllowBluetoothA2DP error:nil];
-    [[AVAudioSession sharedInstance] setPreferredIOBufferDuration:0.005 error:nil];
-    [[AVAudioSession sharedInstance] setPreferredSampleRate:22050 error:nil];
-    [[AVAudioSession sharedInstance] setPreferredInputNumberOfChannels:3 error:nil];
+     AVAudioSessionCategoryOptionAllowBluetoothA2DP|
+     AVAudioSessionCategoryOptionMixWithOthers error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    
+    int recordType = R5RecordTypeLive;
+    if (type == 1) {
+        recordType = R5RecordTypeRecord;
+    } else if (type == 2) {
+        recordType = R5RecordTypeAppend;
+    }
+    
+    
+    _recordType = recordType;
     
     [self unpackProps:props];
     r5_set_log_level(_logLevel);
@@ -140,40 +224,210 @@
             [self establishConnection:configuration];
         }
         
-        [self.stream setAudioController:[[R5AudioController alloc] initWithMode:_audioMode]];
-        [self.stream play:_streamName];
+        if (_useAdaptiveBitrateController) {
+            R5AdaptiveBitrateController *abrController = [[R5AdaptiveBitrateController alloc] init];
+            [abrController attachToStream:self.stream];
+            [abrController setRequiresVideo:_useVideo];
+        }
+        
+        if (_useAudio) {
+            R5Microphone *microphone = [self setUpMicrophone];
+            [self.stream attachAudio:microphone];
+        }
+        
+        if (_useVideo) {
+            R5Camera *camera = [self setUpCamera];
+            [self.stream attachVideo:camera];
+        }
+        
+        [self.stream publish:[self.configuration streamName] type:_recordType];
+        [self onDeviceOrientation:NULL];
+        [self.stream updateStreamMeta];
         
     });
     
 }
 
-- (void)unsubscribe {
+- (void)unpublish {
     
     if (_isStreaming) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.stream stop];
-        });
+        [self.stream stop];
     }
     else {
-        [self emitEvent:@"onUnsubscribeNotification" withBody:@{}];
+        [self emitEvent:@"onUnpublishNotification" withBody:@{}];
         [self tearDown];
     }
     
 }
 
-- (void)setPlaybackVolume:(int)value {
+- (void)setSubscribersCount:(int)count {
+    if (self.sharedObject != nil){
+        [self.sharedObject setProperty:@"Count" withValue:@(count)];
+    }
+}
+
+- (void)swapCamera {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        _useBackfacingCamera = !_useBackfacingCamera;
+        AVCaptureDevice *device = [self getCameraDevice:_useBackfacingCamera];
+        R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
+        [camera setDevice:device];
+    });
+    
+}
+
+- (void)muteAudio {
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         if (_isStreaming) {
-            [[self.stream audioController] setVolume:(value/100)] ;
+            [self.stream setPauseAudio:YES];
         }
     });
+    
+}
+
+- (void)unmuteAudio {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_isStreaming) {
+            [self.stream setPauseAudio:NO];
+        }
+    });
+    
+}
+
+- (void)muteVideo {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_isStreaming) {
+            _hasExplicitlyPausedVideo = YES;
+            [self.stream setPauseVideo:YES];
+        }
+    });
+    
+}
+
+- (void)unmuteVideo {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_isStreaming) {
+            _hasExplicitlyPausedVideo = NO;
+            [self.stream setPauseVideo:NO];
+        }
+    });
+    
+}
+
+- (void)onDeviceOrientation:(NSNotification *)notification {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
+        UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
+        
+        if (orientation == UIDeviceOrientationPortraitUpsideDown) {
+            [camera setOrientation: 270];
+        }
+        else if (orientation == UIDeviceOrientationLandscapeLeft) {
+            if (_useBackfacingCamera) {
+                [camera setOrientation: 0];
+            }
+            else {
+                [camera setOrientation: 180];
+            }
+        }
+        else if (orientation == UIDeviceOrientationLandscapeRight) {
+            if (_useBackfacingCamera) {
+                [camera setOrientation: 180];
+            }
+            else {
+                [camera setOrientation: 0];
+            }
+        }
+        else {
+            [camera setOrientation: 90];
+        }
+        
+        // Because there is no way to attach the view controller as a sub view controller... do it manually.
+        UIInterfaceOrientation statusBarOrientation = [UIApplication sharedApplication].statusBarOrientation;
+        AVCaptureVideoPreviewLayer *preview = [self.stream getPreviewLayer];
+        if(statusBarOrientation == UIInterfaceOrientationPortrait){
+            [[preview connection] setVideoOrientation:AVCaptureVideoOrientationPortrait];
+        } else if (statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown){
+            [[preview connection] setVideoOrientation:AVCaptureVideoOrientationPortraitUpsideDown];
+        } else if (statusBarOrientation == UIInterfaceOrientationLandscapeLeft){
+            [[preview connection] setVideoOrientation:AVCaptureVideoOrientationLandscapeLeft];
+        } else if (statusBarOrientation == UIInterfaceOrientationLandscapeRight){
+            [[preview connection] setVideoOrientation:AVCaptureVideoOrientationLandscapeRight];
+        }
+        
+        [self.stream updateStreamMeta];
+        
+    });
+    
+}
+
+- (void)createSharedObject:(NSString *)streamName{
+    self.sharedObject = [[R5SharedObject alloc] initWithName:streamName connection:self.connection];
+    self.sharedObject.client = self;
+}
+
+- (void)closeSharedObject{
+    if (self.sharedObject != nil){
+        [self.sharedObject close];
+    }
+}
+
+- (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {
+    
+    messageIn[@"type"] = @"onSharedObjectConnect";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
+- (void)followerCountUp:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountUp";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
+- (void)followerCountDown:(NSMutableDictionary*)messageIn{
+    
+    messageIn[@"type"] = @"followerCountDown";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
+- (void)addBroadStory:(NSMutableDictionary *)messageIn{
+    
+    messageIn[@"type"] = @"addBroadStory";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
+- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSMutableDictionary *)param{
+    if (self.sharedObject != nil){
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy:MM:dd:HH:ss.SSS zzz"];
+        NSString *string = [dateFormatter stringFromDate:[NSDate date]];
+        param[@"SendTime"] = string;
+        [self.sharedObject send:eventName withParams:param];
+    }
+}
+
+- (void)onReceiveSharedObjectEvent:(NSMutableDictionary *)param{
+    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:param];
 }
 
 - (void)sendToBackground {
     
     if (!_enableBackgroundStreaming) {
-        [self unsubscribe];
+        [self unpublish];
         return;
+    }
+    
+    if (_isStreaming && self.stream != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.stream setPauseVideo:YES];
+        });
     }
     
 }
@@ -184,10 +438,13 @@
         return;
     }
     
+    if (_isStreaming && self.stream != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.stream setPauseVideo:_hasExplicitlyPausedVideo];
+        });
+    }
+    
 }
-
-
-
 
 - (void)onWillResignActive:(NSNotification *)notification {
     [self sendToBackground];
@@ -204,121 +461,13 @@
     self.viewEmitter = emitter;
 }
 
-- (void)createSharedObject:(NSString *)streamName{
-    self.sharedObject = [[R5SharedObject alloc] initWithName:streamName connection:self.connection];
-    self.sharedObject.client = self;
-}
-
-- (void)closeSharedObject{
-    if (self.sharedObject != nil){
-        [self.sharedObject close];
-    }
-}
-
-
-- (void)onSharedObjectConnect:(NSMutableDictionary *)messageIn {
-    
-    messageIn[@"type"] = @"onSharedObjectConnect";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)notReceiveStory:(NSMutableDictionary *)messageIn {
-    
-    messageIn[@"type"] = @"notReceiveStory";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)followerCountUp:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"followerCountUp";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)followerCountDown:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"followerCountDown";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)modifyBroadcast:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"modifyBroadcast";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)endBroadcast:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"endBroadcast";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)receiveStory:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"receiveStory";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)unMute:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"unMute";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)mute:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"mute";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)subScribersUpdate:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"subScribersUpdate";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)hideBroadStory:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"hideBroadStory";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)showBroadStory:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"showBroadStory";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)showBroadWorry:(NSMutableDictionary*)messageIn{
-    
-    messageIn[@"type"] = @"showBroadWorry";
-    [self onReceiveSharedObjectEvent:messageIn];
-}
-
-- (void)sendSharedObjectEvent:(NSString*)eventName param:(NSDictionary *)param{
-    if (self.sharedObject != nil){
-        [self.sharedObject send:eventName withParams:param];
-    }
-}
-
-- (void)onUpdateProperty:(NSDictionary*)messageIn{
-    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithDictionary:messageIn];
-    dict[@"type"] = @"subScribersUpdate";
-    [self onReceiveSharedObjectEvent:dict];
-}
-
-- (void)onReceiveSharedObjectEvent:(NSMutableDictionary *)param{
-    param[@"SendTime"] = [NSDate date];
-    [_emitter sendEventWithName:@"onReceiveSharedObjectEvent" body:param];
-}
-
-
-
 - (void) setVideoView:(R5VideoViewController *)view {
-
+    
     //    dispatch_async(dispatch_get_main_queue(), ^{
-    if (self.stream != nil && _playbackVideo) {
+    if (self.stream != nil && _useVideo) {
         [view showDebugInfo:_showDebugInfo];
         [view attachStream:self.stream];
+        [self.stream updateStreamMeta];
     }
     //    });
     
@@ -329,8 +478,8 @@
     //    dispatch_async(dispatch_get_main_queue(), ^{
     if (self.stream != nil) {
         [view showDebugInfo:NO];
-        //            [view removeStream]; // NOTE: Requires iOS SDK 5.3.0 or higher.
-        [view attachStream:nil];
+        //            [view attachStream:nil];
+        [self.stream updateStreamMeta];
     }
     //    });
     
@@ -343,19 +492,16 @@
 
 - (void)emitEvent:(NSString *)eventName withBody:(NSDictionary *)body {
     
-    RCTLogInfo(@"R5StreamSubscriber:emitEvent(%@).", eventName);
     if (self.viewEmitter != nil) {
-        RCTLogInfo(@"R5StreamSubscriber:send event on view...");
         if ([eventName isEqualToString:@"onMetaDataEvent"]) {
             self.viewEmitter.onMetaDataEvent(body);
-        } else if([eventName isEqualToString:@"onSubscriberStreamStatus"]) {
-            self.viewEmitter.onSubscriberStreamStatus(body);
-        } else if([eventName isEqualToString:@"onUnsubscribeNotification"]) {
-            self.viewEmitter.onUnsubscribeNotification(body);
+        } else if([eventName isEqualToString:@"onPublisherStreamStatus"]) {
+            self.viewEmitter.onPublisherStreamStatus(body);
+        } else if([eventName isEqualToString:@"onUnpublishNotification"]) {
+            self.viewEmitter.onUnpublishNotification(body);
         }
     }
     else if (_emitter != nil && hasListeners) {
-        RCTLogInfo(@"R5StreamSubscriber:send event on module...");
         [_emitter sendEventWithName:eventName body:body];
     }
     
@@ -363,12 +509,11 @@
 
 # pragma R5StreamDelegate
 -(void)onR5StreamStatus:(R5Stream *)stream withStatus:(int) statusCode withMessage:(NSString*)msg {
-
+    
     NSString *tmpStreamName = _streamName;
     
     if (statusCode == r5_status_start_streaming) {
         _isStreaming = YES;
-        [[AVAudioSession sharedInstance] setActive:YES error:nil];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -378,14 +523,13 @@
                                  @"name": @(r5_string_for_status(statusCode)),
                                  @"streamName": tmpStreamName
                                  };
-        [self emitEvent:@"onSubscriberStreamStatus" withBody:@{@"status": status}] ;
+        
+        [self emitEvent:@"onPublisherStreamStatus" withBody:@{@"status": status}] ;
         
         if (statusCode == r5_status_disconnected && _isStreaming) {
-            [self emitEvent:@"onUnsubscribeNotification" withBody:@{}];
-            _isStreaming = NO;
-        }
-        else if (statusCode == r5_status_connection_close) {
+            [self emitEvent:@"onUnpublishNotification" withBody:@{}];
             [self tearDown];
+            _isStreaming = NO;
         }
     });
     
@@ -401,4 +545,3 @@
 }
 
 @end
-

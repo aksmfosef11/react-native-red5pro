@@ -112,7 +112,7 @@ RCT_REMAP_METHOD(unsubscribe,
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
-        if (streamInstance != nil) {
+        if (streamInstance != nil && [streamInstance isKindOfClass:[R5StreamSubscriber class]]) {
             [(R5StreamSubscriber *)streamInstance closeSharedObject];
             [(R5StreamSubscriber *)streamInstance unsubscribe];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
@@ -169,7 +169,7 @@ RCT_REMAP_METHOD(unpublish,
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
-        if (streamInstance != nil) {
+        if (streamInstance != nil && [streamInstance isKindOfClass:[R5StreamPublisher class]]) {
             [(R5StreamPublisher *)streamInstance closeSharedObject];
             [(R5StreamPublisher *)streamInstance unpublish];
             [[R5StreamModule streamMap] removeObjectForKey:streamId];
