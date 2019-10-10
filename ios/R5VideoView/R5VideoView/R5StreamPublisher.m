@@ -403,6 +403,12 @@
     [self onReceiveSharedObjectEvent:messageIn];
 }
 
+- (void)addHeart:(NSMutableDictionary *)messageIn{
+    
+    messageIn[@"type"] = @"addBroadStory";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
 - (void)sendSharedObjectEvent:(NSString*)eventName param:(NSMutableDictionary *)param{
     if (self.sharedObject != nil){
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];

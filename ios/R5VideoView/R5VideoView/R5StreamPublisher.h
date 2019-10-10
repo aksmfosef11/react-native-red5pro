@@ -32,6 +32,7 @@
 - (void)followerCountUp:(NSMutableDictionary*)messageIn;
 - (void)followerCountDown:(NSMutableDictionary*)messageIn;
 - (void)addBroadStory:(NSMutableDictionary*)messageIn;
+- (void)addHeart:(NSMutableDictionary*)messageIn;
 - (void)setSubscribersCount:(int)count;
 - (void)onReceiveSharedObjectEvent:(NSMutableDictionary*)param;
 
