@@ -405,7 +405,7 @@
 
 - (void)addHeart:(NSMutableDictionary *)messageIn{
     
-    messageIn[@"type"] = @"addBroadStory";
+    messageIn[@"type"] = @"addHeart";
     [self onReceiveSharedObjectEvent:messageIn];
 }
 
