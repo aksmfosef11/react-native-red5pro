@@ -256,7 +256,7 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		establishConnection(configuration, audioMode, logLevel, scaleMode);
 
 		Log.d(TAG, "Show Debug View? " + mShowDebugView);
-		if (enableBackground) {
+		if (enableBackground && mContext != null) {
 			Log.d(TAG, "Setting up bound subscriber for background streaming.");
 			// Set up service and offload setup.
 			mEnableBackgroundStreaming = true;
