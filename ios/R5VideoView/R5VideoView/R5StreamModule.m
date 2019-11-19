@@ -351,7 +351,9 @@ RCT_EXPORT_METHOD(setSubscribersCount:(nonnull NSString *)streamId count:(int)co
         NSObject<R5StreamInstance> *streamInstance = [item getStreamInstance];
         if (streamInstance != nil) {
             RCTLogInfo(@"R5StreamModule:setSubscribersCount() %d", count);
-            [(R5StreamPublisher *)streamInstance setSubscribersCount:count];
+            if([streamInstance respondsToSelector:@selector(setSubscribersCount)]){
+                [(R5StreamPublisher *)streamInstance setSubscribersCount:count];
+            }
         }
     }
 }
