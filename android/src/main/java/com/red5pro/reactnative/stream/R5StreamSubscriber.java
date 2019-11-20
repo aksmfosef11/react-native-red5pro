@@ -260,9 +260,13 @@ public class R5StreamSubscriber implements R5StreamInstance,
 			Log.d(TAG, "Setting up bound subscriber for background streaming.");
 			// Set up service and offload setup.
 			mEnableBackgroundStreaming = true;
-			mSubscribeIntent = new Intent(mContext.getCurrentActivity(), SubscribeService.class);
-			detectToStartService(mSubscribeIntent, mSubscribeServiceConnection, configuration.getStreamName());
-			return this;
+			try {
+				mSubscribeIntent = new Intent(mContext.getCurrentActivity(), SubscribeService.class);
+				detectToStartService(mSubscribeIntent, mSubscribeServiceConnection, configuration.getStreamName());
+				return this;
+			}catch (NullPointerException e){
+				e.printStackTrace();
+			}
 		}
 
 		doSubscribe(configuration.getStreamName());
