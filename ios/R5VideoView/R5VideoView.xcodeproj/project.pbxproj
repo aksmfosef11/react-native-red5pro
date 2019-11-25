@@ -288,6 +288,21 @@
 					"/Users/junholee/Downloads/nagiji-rn/ios/Frameworks/",
 				);
 				GCC_NO_COMMON_BLOCKS = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Private\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/DoubleConversion\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/glog\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-Core\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-cxxreact\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsi\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsiexecutor\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsinspector\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-RCTBlob\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-RCTText\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/Yoga\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -305,6 +320,21 @@
 					"/Users/junholee/Downloads/nagiji-rn/ios/Frameworks/",
 				);
 				GCC_NO_COMMON_BLOCKS = NO;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Private\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/DoubleConversion\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/glog\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-Core\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-cxxreact\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsi\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsiexecutor\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-jsinspector\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-RCTBlob\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/React-RCTText\"",
+					"\"$(SRCROOT)/../../../../ios/Pods/Headers/Public/Yoga\"",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
