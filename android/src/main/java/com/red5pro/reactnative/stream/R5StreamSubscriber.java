@@ -416,6 +416,10 @@ public class R5StreamSubscriber implements R5StreamInstance,
 		onReceiveSharedObjectEvent("subScribersUpdate", jsonToMap(objectValue));
 	}
 
+	public void addHeart(JSONObject objectValue) {
+		onReceiveSharedObjectEvent("addHeart", jsonToMap(objectValue));
+	}
+
 	protected void setSubscriberDisplayOn(Boolean setOn) {
 
 		Log.d(TAG, "setSubscriberDisplayOn(" + setOn + ")");

@@ -246,6 +246,11 @@
     [self onReceiveSharedObjectEvent:messageIn];
 }
 
+- (void)addHeart:(NSMutableDictionary *)messageIn{
+    messageIn[@"type"] = @"addHeart";
+    [self onReceiveSharedObjectEvent:messageIn];
+}
+
 - (void)endBroadcast:(NSMutableDictionary*)messageIn{
     
     messageIn[@"type"] = @"endBroadcast";

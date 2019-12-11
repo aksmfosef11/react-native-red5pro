@@ -33,6 +33,7 @@
 - (void)unMute:(NSMutableDictionary*)messageIn;
 - (void)mute:(NSMutableDictionary*)messageIn;
 - (void)subScribersUpdate:(NSMutableDictionary*)messageIn;
+- (void)addHeart:(NSMutableDictionary*)messageIn;
 - (void)hideBroadStory:(NSMutableDictionary*)messageIn;
 - (void)showBroadStory:(NSMutableDictionary*)messageIn;
 - (void)showBroadWorry:(NSMutableDictionary*)messageIn;
