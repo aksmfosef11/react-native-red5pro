@@ -90,6 +90,17 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 
 	@ReactMethod
 	public void subscribe(String streamId, ReadableMap streamProps, Promise promise) {
+		for (String key: streamMap.keySet()) {
+			if (key != streamId) {
+				R5StreamItem item = streamMap.get(key);
+				if(item.getInstance() != null) {
+					R5StreamInstance instance = item.getInstance();
+					if (instance instanceof R5StreamSubscriber) {
+						((R5StreamSubscriber) instance).unsubscribe();
+					}
+				}
+			}
+		}
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "subscribe:id(" + streamId + ")");
 			R5StreamProps props = R5StreamProps.fromMap(streamProps);
@@ -126,6 +137,17 @@ public class R5StreamModule extends ReactContextBaseJavaModule {
 
 	@ReactMethod
 	public void publish(String streamId, int streamType, ReadableMap streamProps, Promise promise) {
+		for (String key: streamMap.keySet()) {
+			if (key != streamId) {
+				R5StreamItem item = streamMap.get(key);
+				if(item.getInstance() != null) {
+					R5StreamInstance instance = item.getInstance();
+					if (instance instanceof R5StreamSubscriber) {
+						((R5StreamSubscriber) instance).unsubscribe();
+					}
+				}
+			}
+		}
 		if (streamMap.containsKey(streamId)) {
 			Log.d(TAG, "publish:id(" + streamId + ")");
 			R5StreamProps props = R5StreamProps.fromMap(streamProps);

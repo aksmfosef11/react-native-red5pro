@@ -83,6 +83,20 @@ RCT_REMAP_METHOD(subscribe,
     dispatch_async(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
     });
+    for (NSString *key in [R5StreamModule streamMap])
+       {
+           if (key != streamId){
+               R5StreamItem *value = [[R5StreamModule streamMap] objectForKey:streamId];
+           
+               if (value.getStreamInstance != nil){
+                   NSObject<R5StreamInstance> *ins = value.getStreamInstance;
+                   if ([ins isKindOfClass:[R5StreamSubscriber class]]){
+                       [(R5StreamSubscriber *)ins unsubscribe];
+                   }
+               }
+           
+           }
+       }
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamSubscriber *streamInstance = [[R5StreamSubscriber alloc] initWithDeviceEmitter:self];
@@ -140,6 +154,20 @@ RCT_REMAP_METHOD(publish,
     dispatch_async(dispatch_get_main_queue(), ^{
         [[UIApplication sharedApplication] setIdleTimerDisabled: YES];
     });
+    for (NSString *key in [R5StreamModule streamMap])
+       {
+           if (key != streamId){
+               R5StreamItem *value = [[R5StreamModule streamMap] objectForKey:streamId];
+           
+               if (value.getStreamInstance != nil){
+                   NSObject<R5StreamInstance> *ins = value.getStreamInstance;
+                   if ([ins isKindOfClass:[R5StreamSubscriber class]]){
+                       [(R5StreamSubscriber *)ins unsubscribe];
+                   }
+               }
+           
+           }
+       }
     R5StreamItem *item = [[R5StreamModule streamMap] objectForKey:streamId];
     if (item != nil) {
         R5StreamPublisher *streamInstance = [[R5StreamPublisher alloc] initWithDeviceEmitter:self];
