@@ -277,8 +277,10 @@ public class R5StreamSubscriber implements R5StreamInstance,
 	public void unsubscribe() {
 		if (mStream != null && mIsStreaming) {
 			Activity activity = mContext.getCurrentActivity();
-			if (mSubscribeIntent != null) {
+			if (mBackgroundSubscribeService != null) {
 				activity.unbindService(mSubscribeServiceConnection);
+			}
+			if (mSubscribeIntent != null) {
 				activity.stopService(mSubscribeIntent);
 			}
 			mStream.stop();
